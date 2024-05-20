@@ -6,7 +6,7 @@ Group: J
 '''
 
 def hello():
-  print("Hello World!")
+  print("Hello World! TEST")
   return
 
 def main():
