@@ -7,7 +7,7 @@ Group: J
 
 def hello():
   print("Hello World! TEST NEW FEATURE")
-  print("testing a feature specific")
+  print("testing a feature specific 2")
   return
 
 def main():
