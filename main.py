@@ -4,6 +4,7 @@ Contributors: Corey Daley, Josh Keyes, Luke Raven, Zachary Wilson
 Course: CS2450
 Group: J
 '''
+'test'
 
 class BasicML:
     '''Initialized with a 100 word memory and a single
