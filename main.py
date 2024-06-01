@@ -1,6 +1,6 @@
 '''
 Project Name: UVSim
-Contributors: Corey Daley, Josh Keyes, Luke Raven, Zachary Wilson
+Contributors: Corey Daley, Josh Keyes, Steven Martins, Zachary Wilson
 Course: CS2450
 Group: J
 '''
