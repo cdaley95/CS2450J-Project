@@ -21,12 +21,30 @@ class BasicML:
         }
 
     def load(self):
-        'Loads word from memory address into accumulator'
+        '''
+        Loads word from memory address into accumulator
+        '''
         self.accumulator = self.memory[int(self.memory[self.pointer][3:])]
 
     def store(self):
-        'Stores word from accumulator into memory address'
+        '''
+        Stores word from accumulator into memory address
+        '''
         self.memory[int(self.memory[self.pointer][3:])] = self.accumulator
+
+    def read(self):
+        '''
+        Reads a word from the terminal and stores it in memory
+        '''
+        word_to_read = input(f"Word to read into memory location {self.memory[self.pointer][3:]}: ")
+
+        # This simply uses the pointer as the spot in memory where this command is being called
+        self.memory[int(self.memory[self.pointer][3:])] = word_to_read
+    def write(self):
+        '''
+        Writes a word from a location in memory to the screen
+        '''
+        print(self.memory[int(self.memory[self.pointer][3:])])
 
     #Needs a class method to run the program and iterate the pointer
 
