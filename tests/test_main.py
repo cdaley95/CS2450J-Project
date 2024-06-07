@@ -22,7 +22,7 @@ def test_read(address, expected, monkeypatch):
     (3, "9+945"),
     (4, "-8675309")
 ])
-def test_read(address, monkeyinput, monkeypatch):
+def test_read_fail(address, monkeyinput, monkeypatch):
     with pytest.raises(ValueError):
         ml = BasicML()
         monkeypatch.setattr('builtins.input', lambda _: monkeyinput)
