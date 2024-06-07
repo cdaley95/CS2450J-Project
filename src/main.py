@@ -72,7 +72,7 @@ class BasicML:
 
     def branch(self, address):
         'Branches to a specific location in memory if accumulator is positive'
-        if self.accumulator[0] == "+"
+        if self.accumulator[0] == "+":
             self.pointer = address
 
     def branchneg(self, address):
@@ -156,8 +156,8 @@ def main():
     '''main method docstring'''
     basic_ml = BasicML()
     # TODO Allow for file input
-    source_location = str(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))+
-        "\\files"+str(input("Name of file: "))
+    source_location = str(os.path.dirname(os.path.dirname(
+        os.path.abspath(__file__))))+"\\files"+str(input("Name of file: "))
     # source_location = "test.txt"
 
     # Reading and adding lines to memory
@@ -166,7 +166,7 @@ def main():
             # Reading lines
             lines = file.readlines()
             # Adding lines to memory
-            for line_index, line in enumerate(lines)
+            for line_index, line in enumerate(lines):
                 stripped_line = line.rstrip('\n')
                 if len(stripped_line) != 5:
                     raise ValueError("File contents are not in correct format")
@@ -175,7 +175,7 @@ def main():
                 if not stripped_line[1:].isdigit():
                     raise ValueError("File contents are not in correct format")
                 basic_ml.memory[line_index] = lines[line_index]
-    except FileNotFoundError::
+    except FileNotFoundError:
         print("Not a valid file location.")
         return
     except ValueError as e:
