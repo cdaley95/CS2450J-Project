@@ -70,6 +70,26 @@ class BasicML:
         'Stores word from accumulator into memory address'
         self.memory[address] = self.accumulator
 
+    def add(self, address):
+        'Adds word from memory address to accumulator'
+        self.accumulator = self.wrap_around(
+            self.add_words(self.accumulator, self.memory[address]))
+
+    def subtract(self, address):
+        'Subtracts word from memory address from accumulator'
+        self.accumulator = self.wrap_around(
+            self.subtract_words(self.accumulator, self.memory[address]))
+
+    def divide(self, address):
+        'Divides accumulator by word from memory address'
+        self.accumulator = self.wrap_around(
+            self.divide_words(self.accumulator, self.memory[address]))
+
+    def multiply(self, address):
+        'Multiplies accumulator by word from memory address'
+        self.accumulator = self.wrap_around(
+            self.multiply_words(self.accumulator, self.memory[address]))
+
     def branch(self, address):
         'Branches to a specific location in memory if accumulator is positive'
         if self.accumulator[0] == "+":
@@ -82,46 +102,12 @@ class BasicML:
 
     def branchzero(self, address):
         'Branches to a specific location in memory if the accumulator is zero'
-        if self.accumulator == "+0000":
+        if int(self.accumulator) == 0:
             self.pointer = address
 
     def halt(self):
         'Stops the program'
         self.pointer = 100
-
-    def load(self, address):
-        'Loads word from memory address into accumulator'
-        self.accumulator = self.memory[address]
-        self.pointer += 1
-
-    def store(self, address):
-        'Stores word from accumulator into memory address'
-        self.memory[address] = self.accumulator
-        self.pointer += 1
-
-    def add(self, address):
-        'Adds word from memory address to accumulator'
-        self.accumulator = self.wrap_around(
-            self.add_words(self.accumulator, self.memory[address]))
-        self.pointer += 1
-
-    def subtract(self, address):
-        'Subtracts word from memory address from accumulator'
-        self.accumulator = self.wrap_around(
-            self.subtract_words(self.accumulator, self.memory[address]))
-        self.pointer += 1
-
-    def divide(self, address):
-        'Divides accumulator by word from memory address'
-        self.accumulator = self.wrap_around(
-            self.divide_words(self.accumulator, self.memory[address]))
-        self.pointer += 1
-
-    def multiply(self, address):
-        'Multiplies accumulator by word from memory address'
-        self.accumulator = self.wrap_around(
-            self.multiply_words(self.accumulator, self.memory[address]))
-        self.pointer += 1
 
     def add_words(self, word1, word2):
         result = int(word1) + int(word2)
@@ -156,8 +142,8 @@ def main():
     '''main method docstring'''
     basic_ml = BasicML()
     # TODO Allow for file input
-    source_location = str(os.path.dirname(os.path.dirname(
-        os.path.abspath(__file__))))+"\\files\\"+str(input("Name of file: "))
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    source_location = os.path.join(parent_dir, "files", input("Name of file: "))
     print(source_location)
     # source_location = "test.txt"
 
