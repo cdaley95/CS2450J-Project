@@ -135,8 +135,8 @@ def test_multiply(one, two, expected):
     assert ml.accumulator == expected
 
 @pytest.mark.parametrize("one, two, expected", [
-    ("+0001", "+0001", "+0001"),
-    ("-0001", "+0001", "-0001")
+    ("+0025", "+0005", "+0005"),
+    ("-0030", "+0003", "-0010")
 ])
 def test_divide(one, two, expected):
     ml = BasicML()
