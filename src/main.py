@@ -57,6 +57,8 @@ class BasicML:
     def read(self, address):
         'Reads a word from the terminal and stores it in memory'
         usrinput = input(f"Word into memory location {address}: ")
+        if len(usrinput) != 5:
+            raise ValueError("Input must be a signed 5 character word with 4 digits")
         if usrinput[0] not in ['+', '-']:
             raise ValueError("Input must be a signed 5 character word with 4 digits")
         if not usrinput[1:].isdigit():
