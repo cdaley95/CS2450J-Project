@@ -80,6 +80,7 @@ def test_store(address, expected):
 ])
 def test_branch(address):
     ml = BasicML()
+    ml.accumulator = "+0001"
     ml.branch(address)
     assert ml.pointer == address
 
