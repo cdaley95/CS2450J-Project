@@ -15,6 +15,19 @@ def test_read(address, expected, monkeypatch):
     ml.read(address)
     assert ml.memory[address] == expected
 
+@pytest.mark.parametrize("address, monkeyinput", [
+    (0, "+123"),
+    (1, "23456"),
+    (2, "+abcd"),
+    (3, "9+945"),
+    (4, "-8675309")
+])
+def test_read(address, monkeyinput, monkeypatch):
+    with pytest.raises(ValueError):
+        ml = BasicML()
+        monkeypatch.setattr('builtins.input', lambda _: monkeyinput)
+        ml.read(address)
+
 @pytest.mark.parametrize("address, expected", [
     (0, "+1234"),
     (1, "+2345"),
