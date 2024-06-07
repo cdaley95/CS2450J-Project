@@ -11,7 +11,7 @@ from src.main import BasicML
 ])
 def test_read(address, expected, monkeypatch):
     ml = BasicML()
-    monkeypatch.setattr('builtins.input', lambda_: expected)
+    monkeypatch.setattr('builtins.input', lambda _: expected)
     m1.read(address)
     assert m1.memory[address] == expected
 
