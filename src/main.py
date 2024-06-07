@@ -161,7 +161,7 @@ def main():
                     raise ValueError("File contents are not in correct format")
                 if not stripped_line[1:].isdigit():
                     raise ValueError("File contents are not in correct format")
-                basic_ml.memory[line_index] = lines[line_index]
+                basic_ml.memory[line_index] = stripped_line
     except FileNotFoundError:
         print("Not a valid file location.")
         return
