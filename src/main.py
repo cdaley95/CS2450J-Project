@@ -41,6 +41,8 @@ class BasicML:
                 self.branchzero(memory_loc)
             case "43":
                 self.halt()
+                
+                
     def read(self, address):
         'Reads a word from the terminal and stores it in memory'
         self.memory[address] = input(f"Word into memory location {address}: ")
@@ -83,20 +85,24 @@ def main():
     '''main method docstring'''
     basic_ml = BasicML()
     # TODO Allow for file input
-    # source_location = input("Name and location of file: ")
-    source_location = "test.txt"
+    source_location = input("Name and location of file: ")
+    # source_location = "test.txt"
 
     # Reading and adding lines to memory
-    with open(source_location, 'r') as file:
-        # Reading lines
-        lines = file.readlines()
-        # Adding lines to memory
-        for line_index in range(0, len(lines)):
-            basic_ml.memory[line_index] = lines[line_index][:5]
+    try:
+        with open(source_location, 'r') as file:
+            # Reading lines
+            lines = file.readlines()
+            # Adding lines to memory
+            for line_index in range(0, len(lines)):
+                basic_ml.memory[line_index] = lines[line_index][:5]
+    except:
+        print("Not a valid file location.")
+        return
     # Executing lines from memory
     while basic_ml.pointer != 100:
         basic_ml.exec_instruction(basic_ml.memory[int(basic_ml.pointer)])
-    print("\nFinished")
+    print("\nFinished.")
 
 
 if __name__ == "__main__":
