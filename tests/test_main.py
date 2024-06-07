@@ -104,38 +104,35 @@ def test_halt():
     ml.halt()
     assert ml.pointer == 100
 
-
-def test_add():
+@pytest.mark.parametrize("one, two, expected", [
+    ("+0001", "+0001", "+0002"),
+    ("-0001", "+0001", "+0000"),
+    ("+0002", "+9999", "-0001")
+])
+def test_add(one, two, expected):
     ml = BasicML()
-    ml.accumulator = "+0000"
-    ml.accumulator = ml.wrap_around(ml.add_words("+0001", "+0001"))
-    assert ml.accumulator == "+0002"
-    ml.accumulator = ml.wrap_around(ml.add_words("-0001", "+0001"))
-    assert ml.accumulator == "+0000"
-    ml.accumulator = ml.wrap_around(ml.add_words("+0002", "+9999"))
-    assert ml.accumulator == "-0001"
+    ml.accumulator = ml.wrap_around(ml.add_words(one, two))
+    assert ml.accumulator == expected
 
-
-def test_subtract():
+@pytest.mark.parametrize("one, two, expected", [
+    ("+0001", "+0001", "+0000"),
+    ("-0001", "+0002", "-0003"),
+    ("+0000", "+0002", "-0002")
+])
+def test_subtract(one, two, expected):
     ml = BasicML()
-    ml.accumulator = "+0000"
-    ml.accumulator = ml.wrap_around(ml.subtract_words("+0001", "+0001"))
-    assert ml.accumulator == "+0000"
-    ml.accumulator = ml.wrap_around(ml.subtract_words("-0001", "+0002"))
-    assert ml.accumulator == "-0003"
-    ml.accumulator = ml.wrap_around(ml.subtract_words("+0000", "+0002"))
-    assert ml.accumulator == "-0002"
+    ml.accumulator = ml.wrap_around(ml.subtract_words(one, two))
+    assert ml.accumulator == expected
 
-
-def test_multiply():
+@pytest.mark.parametrize("one, two, expected", [
+    ("+0001", "+0005", "+0005"),
+    ("-0001", "+0005", "-0005"),
+    ("+0002", "+5002", "-0004"),
+])
+def test_multiply(one, two, expected):
     ml = BasicML()
-    ml.accumulator = "+0000"
-    ml.accumulator = ml.wrap_around(ml.multiply_words("+0001", "+0005"))
-    assert ml.accumulator == "+0005"
-    ml.accumulator = ml.wrap_around(ml.multiply_words("-0001", "+0005"))
-    assert ml.accumulator == "-0005"
-    ml.accumulator = ml.wrap_around(ml.multiply_words("+0002", "+5002"))
-    assert ml.accumulator == "-0004"
+    ml.accumulator = ml.wrap_around(ml.multiply_words(one, two))
+    assert ml.accumulator == expected
 
 
 def test_divide():
