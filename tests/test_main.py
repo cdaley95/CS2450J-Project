@@ -134,11 +134,21 @@ def test_multiply(one, two, expected):
     ml.accumulator = ml.wrap_around(ml.multiply_words(one, two))
     assert ml.accumulator == expected
 
-
-def test_divide():
+@pytest.mark.parametrize("one, two, expected", [
+    ("+0001", "+0001", "+0001"),
+    ("-0001", "+0001", "-0001")
+])
+def test_divide(one, two, expected):
     ml = BasicML()
-    ml.accumulator = "+0000"
-    ml.accumulator = ml.wrap_around(ml.divide_words("+0001", "+0001"))
-    assert ml.accumulator == "+0001"
-    ml.accumulator = ml.wrap_around(ml.divide_words("-0001", "+0001"))
-    assert ml.accumulator == "-0001"
+    ml.accumulator = ml.wrap_around(ml.divide_words(one, two))
+    assert ml.accumulator == expected
+
+@pytest.mark.parametrize("one, two", [
+    ("+0001", "+0000"),
+    ("-0001", "-0000")
+])
+def test_divide_zero(one, two,):
+    with pytest.raises(ZeroDivisionError):
+        ml = BasicML()
+        ml.accumulator = ml.wrap_around(ml.divide_words(one, two))
+
