@@ -157,7 +157,8 @@ def main():
     basic_ml = BasicML()
     # TODO Allow for file input
     source_location = str(os.path.dirname(os.path.dirname(
-        os.path.abspath(__file__))))+"\\files"+str(input("Name of file: "))
+        os.path.abspath(__file__))))+"\\files\\"+str(input("Name of file: "))
+    print(source_location)
     # source_location = "test.txt"
 
     # Reading and adding lines to memory
