@@ -16,21 +16,31 @@ class BasicML:
         self.accumulator = "+0000"
         self.pointer = 0
 
-        # Dictionary mapping opcodes to class methods
-        self.instructions = {
-            10: self.read,
-            11: self.write,
-            20: self.load,
-            21: self.store,
-            30: self.add,
-            31: self.subtract,
-            32: self.divide,
-            33: self.multiply,
-            40: self.branch,
-            41: self.branchneg,
-            42: self.branchzero,
-            43: self.halt
-        }
+    def exec_instruction(self, instruction_code):
+        '''Parses the code into the instruction and the memory location. Also matches the instruction number to the method to execute.'''
+        memory_loc = int(instruction_code[3:])
+        instruction = instruction_code[1:3]
+        match instruction:
+            case "10":
+                self.read(memory_loc)
+                self.pointer += 1
+            case "11":
+                self.write(memory_loc)
+                self.pointer += 1
+            case "20":
+                self.load(memory_loc)
+                self.pointer += 1
+            case "21":
+                self.store(memory_loc)
+                self.pointer += 1
+            case "40":
+                self.branch(memory_loc)
+            case "41":
+                self.branchneg(memory_loc)
+            case "42":
+                self.branchzero(memory_loc)
+            case "43":
+                self.halt()
 
     def read(self, address):
         'Reads a word from the terminal and stores it in memory'
@@ -81,25 +91,29 @@ class BasicML:
     def add(self):
         'Adds word from memory address to accumulator'
         address = int(self.memory[self.pointer][3:])
-        self.accumulator = self.wrap_around(self.add_words(self.accumulator, self.memory[address]))
+        self.accumulator = self.wrap_around(
+            self.add_words(self.accumulator, self.memory[address]))
         self.pointer += 1
 
     def subtract(self):
         'Subtracts word from memory address from accumulator'
         address = int(self.memory[self.pointer][3:])
-        self.accumulator = self.wrap_around(self.subtract_words(self.accumulator, self.memory[address]))
+        self.accumulator = self.wrap_around(
+            self.subtract_words(self.accumulator, self.memory[address]))
         self.pointer += 1
 
     def divide(self):
         'Divides accumulator by word from memory address'
         address = int(self.memory[self.pointer][3:])
-        self.accumulator = self.wrap_around(self.divide_words(self.accumulator, self.memory[address]))
+        self.accumulator = self.wrap_around(
+            self.divide_words(self.accumulator, self.memory[address]))
         self.pointer += 1
 
     def multiply(self):
         'Multiplies accumulator by word from memory address'
         address = int(self.memory[self.pointer][3:])
-        self.accumulator = self.wrap_around(self.multiply_words(self.accumulator, self.memory[address]))
+        self.accumulator = self.wrap_around(
+            self.multiply_words(self.accumulator, self.memory[address]))
         self.pointer += 1
 
     def add_words(self, word1, word2):
@@ -134,8 +148,26 @@ class BasicML:
 
 def main():
     '''main method docstring'''
-    # Need to implement loading from file here
-    return
+    basic_ml = BasicML()
+    # TODO Allow for file input
+    source_location = input("Name and location of file: ")
+    # source_location = "test.txt"
+
+    # Reading and adding lines to memory
+    try:
+        with open(source_location, 'r') as file:
+            # Reading lines
+            lines = file.readlines()
+            # Adding lines to memory
+            for line_index in range(0, len(lines)):
+                basic_ml.memory[line_index] = lines[line_index][:5]
+    except:
+        print("Not a valid file location.")
+        return
+    # Executing lines from memory
+    while basic_ml.pointer != 100:
+        basic_ml.exec_instruction(basic_ml.memory[int(basic_ml.pointer)])
+    print("\nFinished.")
 
 
 if __name__ == "__main__":
