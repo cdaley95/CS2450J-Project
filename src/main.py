@@ -4,7 +4,7 @@ Contributors: Corey Daley, Josh Keyes, Steven Martins, Zachary Wilson
 Course: CS2450
 Group: J
 '''
-
+import os
 
 class BasicML:
     '''Initialized with a 100 word memory and a single
@@ -156,7 +156,8 @@ def main():
     '''main method docstring'''
     basic_ml = BasicML()
     # TODO Allow for file input
-    source_location = input("Name and location of file: ")
+    source_location = str(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))+
+        "\\files"+str(input("Name of file: "))
     # source_location = "test.txt"
 
     # Reading and adding lines to memory
@@ -165,10 +166,20 @@ def main():
             # Reading lines
             lines = file.readlines()
             # Adding lines to memory
-            for line_index in range(0, len(lines)):
-                basic_ml.memory[line_index] = lines[line_index][:5]
-    except:
+            for line_index, line in enumerate(lines)
+                stripped_line = line.rstrip('\n')
+                if len(stripped_line) != 5:
+                    raise ValueError("File contents are not in correct format")
+                if stripped_line[0] not in ['+','-']:
+                    raise ValueError("File contents are not in correct format")
+                if not stripped_line[1:].isdigit():
+                    raise ValueError("File contents are not in correct format")
+                basic_ml.memory[line_index] = lines[line_index]
+    except FileNotFoundError::
         print("Not a valid file location.")
+        return
+    except ValueError as e:
+        print(e)
         return
     # Executing lines from memory
     while basic_ml.pointer != 100:
