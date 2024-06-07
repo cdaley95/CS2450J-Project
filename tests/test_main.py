@@ -91,3 +91,41 @@ def test_halt():
     ml = BasicML()
     ml.halt()
     assert ml.pointer == 100
+
+def test_add():
+    ml = BasicML()
+    ml.accumulator = "+0000"
+    ml.accumulator = ml.wrap_around(ml.add_words("+0001", "+0001"))
+    assert ml.accumulator == "+0002"
+    ml.accumulator = ml.wrap_around(ml.add_words("-0001", "+0001"))
+    assert ml.accumulator == "+0000"
+    ml.accumulator = ml.wrap_around(ml.add_words("+0002", "+9999"))
+    assert ml.accumulator == "-0001"
+    
+def test_subtract():
+    ml = BasicML()
+    ml.accumulator = "+0000"
+    ml.accumulator = ml.wrap_around(ml.subtract_words("+0001", "+0001"))
+    assert ml.accumulator == "+0000"
+    ml.accumulator = ml.wrap_around(ml.subtract_words("-0001", "+0002"))
+    assert ml.accumulator == "-0003"
+    ml.accumulator = ml.wrap_around(ml.subtract_words("+0000", "+0002"))
+    assert ml.accumulator == "-0002"
+
+def test_multiply():
+    ml = BasicML()
+    ml.accumulator = "+0000"
+    ml.accumulator = ml.wrap_around(ml.multiply_words("+0001", "+0005"))
+    assert ml.accumulator == "+0005"
+    ml.accumulator = ml.wrap_around(ml.multiply_words("-0001", "+0005"))
+    assert ml.accumulator == "-0005"
+    ml.accumulator = ml.wrap_around(ml.multiply_words("+0002", "+5002"))
+    assert ml.accumulator == "-0004"
+
+def test_divide():
+    ml = BasicML()
+    ml.accumulator = "+0000"
+    ml.accumulator = ml.wrap_around(ml.divide_words("+0001", "+0001"))
+    assert ml.accumulator == "+0001"
+    ml.accumulator = ml.wrap_around(ml.divide_words("-0001", "+0001"))
+    assert ml.accumulator == "-0001"
