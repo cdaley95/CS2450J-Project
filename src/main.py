@@ -33,6 +33,18 @@ class BasicML:
             case "21":
                 self.store(memory_loc)
                 self.pointer += 1
+            case "30":
+                self.add(memory_loc)
+                self.pointer += 1
+            case "31":
+                self.subtract(memory_loc)
+                self.pointer += 1
+            case "32":
+                self.divide(memory_loc)
+                self.pointer += 1
+            case "33":
+                self.multiply(memory_loc)
+                self.pointer += 1
             case "40":
                 self.branch(memory_loc)
             case "41":
@@ -59,8 +71,9 @@ class BasicML:
         self.memory[address] = self.accumulator
 
     def branch(self, address):
-        'Branches to a specific location in memory'
-        self.pointer = address
+        'Branches to a specific location in memory if accumulator is positive'
+        if self.accumulator[0] == "+"
+            self.pointer = address
 
     def branchneg(self, address):
         'Branches to a specific location in memory if the accumulator is negative'
@@ -76,42 +89,36 @@ class BasicML:
         'Stops the program'
         self.pointer = 100
 
-    def load(self):
+    def load(self, address):
         'Loads word from memory address into accumulator'
-        address = int(self.memory[self.pointer][3:])
         self.accumulator = self.memory[address]
         self.pointer += 1
 
-    def store(self):
+    def store(self, address):
         'Stores word from accumulator into memory address'
-        address = int(self.memory[self.pointer][3:])
         self.memory[address] = self.accumulator
         self.pointer += 1
 
-    def add(self):
+    def add(self, address):
         'Adds word from memory address to accumulator'
-        address = int(self.memory[self.pointer][3:])
         self.accumulator = self.wrap_around(
             self.add_words(self.accumulator, self.memory[address]))
         self.pointer += 1
 
-    def subtract(self):
+    def subtract(self, address):
         'Subtracts word from memory address from accumulator'
-        address = int(self.memory[self.pointer][3:])
         self.accumulator = self.wrap_around(
             self.subtract_words(self.accumulator, self.memory[address]))
         self.pointer += 1
 
-    def divide(self):
+    def divide(self, address):
         'Divides accumulator by word from memory address'
-        address = int(self.memory[self.pointer][3:])
         self.accumulator = self.wrap_around(
             self.divide_words(self.accumulator, self.memory[address]))
         self.pointer += 1
 
-    def multiply(self):
+    def multiply(self, address):
         'Multiplies accumulator by word from memory address'
-        address = int(self.memory[self.pointer][3:])
         self.accumulator = self.wrap_around(
             self.multiply_words(self.accumulator, self.memory[address]))
         self.pointer += 1
@@ -143,7 +150,6 @@ class BasicML:
             elif num < -limit:
                 num = -(num + limit + 1)
         return f"{num:+05d}"
-    # Needs a class method to run the program and iterate the pointer
 
 
 def main():
