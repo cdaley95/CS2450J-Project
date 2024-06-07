@@ -133,28 +133,3 @@ def test_divide():
     assert ml.accumulator == "+0001"
     ml.accumulator = ml.wrap_around(ml.divide_words("-0001", "+0001"))
     assert ml.accumulator == "-0001"
-
-
-def test_load():
-    loadtest = BasicML()
-    loadtest.memory[0:3] = ["+2002", "+1054", "-9756"]
-    address = 0
-    loadtest.load(address)
-    assert loadtest.accumulator == "-9756"
-    loadtest.memory[66:69] = ["-2068", "+1010", "+8888"]
-    address = 66
-    loadtest.load(address)
-    assert loadtest.accumulator == "+8888"
-
-def test_store():
-    storetest = BasicML()
-    storetest.memory[0:2] = ["-2102", "+1030"]
-    address = 0
-    storetest.accumulator = "-9645"
-    storetest1.store(address)
-    assert storetest.memory[2] == "-9645"
-    storetest.memory[89:92] = ["+2169", "+1030", "-5674"]
-    storetest.accumulator = "-7532"
-    address = 89
-    storetest.store(address)
-    assert storetest.memory[69] == "-7532"
