@@ -57,12 +57,18 @@ class BasicML:
     def read(self, address):
         'Reads a word from the terminal and stores it in memory'
         usrinput = input(f"Word into memory location {address}: ")
-        if len(usrinput) != 5:
-            raise ValueError("Input must be a signed 5 character word with 4 digits")
-        if usrinput[0] not in ['+', '-']:
-            raise ValueError("Input must be a signed 5 character word with 4 digits")
-        if not usrinput[1:].isdigit():
-            raise ValueError("Input must be a signed 5 character word with 4 digits")
+        if len(usrinput) == 5:
+            if usrinput[0] not in ['+', '-']:
+                raise ValueError("Input must either signed 5 character or unsigned 4 character word with 4 digits.")
+            if not usrinput[1:].isdigit():
+                raise ValueError("Input must either signed 5 character or unsigned 4 character word with 4 digits.")
+        elif len(usrinput) == 4:
+            if not usrinput.isdigit():
+                raise ValueError("Input must either signed 5 character or unsigned 4 character word with 4 digits.")
+            else:
+                usrinput = "+"+usrinput
+        else:
+             raise ValueError("Input must either signed 5 character or unsigned 4 character word with 4 digits.")
         self.memory[address] = usrinput
 
     def write(self, address):
@@ -141,14 +147,8 @@ class BasicML:
         return f"{result:+05d}"
 
     def wrap_around(self, word):
-        num = int(word)
-        limit = 9999
-        while num > limit or num < -limit:
-            if num > limit:
-                num = -(num - limit - 1)
-            elif num < -limit:
-                num = -(num + limit + 1)
-        return f"{num:+05d}"
+        if len(word) > 5:
+            return word[0]+word[2:]
 
 
 def main():
