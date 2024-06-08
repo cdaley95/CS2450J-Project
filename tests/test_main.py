@@ -84,6 +84,18 @@ def test_branch(address):
     ml.branch(address)
     assert ml.pointer == address
 
+@pytest.mark.parametrize("address", [
+    (5),
+    (4),
+    (3),
+    (2),
+    (1)
+])
+def test_nobranch(address):
+    ml = BasicML()
+    ml.accumulator = "-0001"
+    ml.branch(address)
+    assert ml.pointer != address
 
 @pytest.mark.parametrize("address", [
     (5),
@@ -98,6 +110,18 @@ def test_branchneg(address):
     ml.branchneg(address)
     assert ml.pointer == address
 
+@pytest.mark.parametrize("address", [
+    (5),
+    (4),
+    (3),
+    (2),
+    (1)
+])
+def test_nobranchneg(address):
+    ml = BasicML()
+    ml.accumulator = "+1234"
+    ml.branchneg(address)
+    assert ml.pointer != address
 
 @pytest.mark.parametrize("address", [
     (5),
@@ -112,6 +136,18 @@ def test_branchzero(address):
     ml.branchzero(address)
     assert ml.pointer == address
 
+@pytest.mark.parametrize("address", [
+    (5),
+    (4),
+    (3),
+    (2),
+    (1)
+])
+def test_nobranchzero(address):
+    ml = BasicML()
+    ml.accumulator = "+0001"
+    ml.branchzero(address)
+    assert ml.pointer != address
 
 def test_halt():
     ml = BasicML()
