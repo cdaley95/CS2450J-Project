@@ -149,6 +149,7 @@ class BasicML:
     def wrap_around(self, word):
         if len(word) > 5:
             return word[0]+word[2:]
+        return word
 
 
 def main():
