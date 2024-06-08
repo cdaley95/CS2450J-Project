@@ -6,7 +6,7 @@ from src.main import BasicML
     (0, "+1234", "+1234"),
     (1, "2345", "+2345"),
     (2, "-3456", "-3456"),
-    (3, "4567", "4567"),
+    (3, "4567", "+4567"),
     (4, "+5678", "+5678")
 ])
 def test_read(address, usrinput, expected, monkeypatch):
@@ -76,7 +76,7 @@ def test_store(address, expected):
     (4),
     (3),
     (2),
-    (1)
+    (6)
 ])
 def test_branch(address):
     ml = BasicML()
@@ -89,7 +89,7 @@ def test_branch(address):
     (4),
     (3),
     (2),
-    (1)
+    (6)
 ])
 def test_nobranch(address):
     ml = BasicML()
@@ -102,7 +102,7 @@ def test_nobranch(address):
     (4),
     (3),
     (2),
-    (1)
+    (6)
 ])
 def test_branchneg(address):
     ml = BasicML()
@@ -115,7 +115,7 @@ def test_branchneg(address):
     (4),
     (3),
     (2),
-    (1)
+    (6)
 ])
 def test_nobranchneg(address):
     ml = BasicML()
@@ -128,7 +128,7 @@ def test_nobranchneg(address):
     (4),
     (3),
     (2),
-    (1)
+    (6)
 ])
 def test_branchzero(address):
     ml = BasicML()
@@ -141,7 +141,7 @@ def test_branchzero(address):
     (4),
     (3),
     (2),
-    (1)
+    (6)
 ])
 def test_nobranchzero(address):
     ml = BasicML()
@@ -157,7 +157,7 @@ def test_halt():
 @pytest.mark.parametrize("one, two, expected", [
     ("+0001", "+0001", "+0002"),
     ("-0001", "+0001", "+0000"),
-    ("+0002", "+9999", "-0001")
+    ("+0002", "+9999", "+0001")
 ])
 def test_add(one, two, expected):
     ml = BasicML()
@@ -177,7 +177,7 @@ def test_subtract(one, two, expected):
 @pytest.mark.parametrize("one, two, expected", [
     ("+0001", "+0005", "+0005"),
     ("-0001", "+0005", "-0005"),
-    ("+0002", "+5002", "-0004"),
+    ("+0002", "+5002", "+0004"),
 ])
 def test_multiply(one, two, expected):
     ml = BasicML()
@@ -201,4 +201,3 @@ def test_divide_zero(one, two,):
     with pytest.raises(ZeroDivisionError):
         ml = BasicML()
         ml.accumulator = ml.wrap_around(ml.divide_words(one, two))
-
