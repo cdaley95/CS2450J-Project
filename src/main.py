@@ -101,16 +101,22 @@ class BasicML:
         'Branches to a specific location in memory if accumulator is positive'
         if self.accumulator[0] == "+":
             self.pointer = address
+        else:
+            self.pointer += 1
 
     def branchneg(self, address):
         'Branches to a specific location in memory if the accumulator is negative'
         if self.accumulator[0] == "-":
             self.pointer = address
+        else:
+            self.pointer += 1
 
     def branchzero(self, address):
         'Branches to a specific location in memory if the accumulator is zero'
         if int(self.accumulator) == 0:
             self.pointer = address
+        else:
+            self.pointer += 1
 
     def halt(self):
         'Stops the program'
