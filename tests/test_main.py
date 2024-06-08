@@ -2,14 +2,14 @@ import pytest
 
 from src.main import BasicML
 
-@pytest.mark.parametrize("address, expected", [
-    (0, "+1234"),
-    (1, "+2345"),
-    (2, "+3456"),
-    (3, "+4567"),
-    (4, "+5678")
+@pytest.mark.parametrize("address, usrinput, expected", [
+    (0, "+1234", "+1234"),
+    (1, "2345", "+2345"),
+    (2, "-3456", "-3456"),
+    (3, "4567", "4567"),
+    (4, "+5678", "+5678")
 ])
-def test_read(address, expected, monkeypatch):
+def test_read(address, usrinput, expected, monkeypatch):
     ml = BasicML()
     monkeypatch.setattr('builtins.input', lambda _: expected)
     ml.read(address)
