@@ -62,11 +62,11 @@ class BasicML:
                 raise ValueError("Input must either signed 5 character or unsigned 4 character word with 4 digits.")
             if not usrinput[1:].isdigit():
                 raise ValueError("Input must either signed 5 character or unsigned 4 character word with 4 digits.")
-        elif len(usrinput) == 4:
+        elif len(usrinput) <= 4:
             if not usrinput.isdigit():
                 raise ValueError("Input must either signed 5 character or unsigned 4 character word with 4 digits.")
             else:
-                usrinput = "+"+usrinput
+                usrinput = "+"+usrinput.zfill(4)
         else:
              raise ValueError("Input must either signed 5 character or unsigned 4 character word with 4 digits.")
         self.memory[address] = usrinput
