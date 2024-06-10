@@ -59,16 +59,25 @@ class BasicML:
         usrinput = input(f"Word into memory location {address}: ")
         if len(usrinput) == 5:
             if usrinput[0] not in ['+', '-']:
-                raise ValueError("Input must either signed 5 character or unsigned 4 character word with 4 digits.")
+                raise ValueError("Input must either signed 5 character or"
+                                 " unsigned 4 character word with 4 digits.")
             if not usrinput[1:].isdigit():
-                raise ValueError("Input must either signed 5 character or unsigned 4 character word with 4 digits.")
+                raise ValueError("Input must either signed 5 character or"
+                                 " unsigned 4 character word with 4 digits.")
         elif len(usrinput) <= 4:
-            if not usrinput.isdigit():
-                raise ValueError("Input must either signed 5 character or unsigned 4 character word with 4 digits.")
+            if usrinput[0] == "-":
+                if not usrinput[1:].isdigit():
+                    raise ValueError("Input must either signed 5 character or"
+                                     " unsigned 4 character word with 4 digits.")
+                usrinput = "-"+usrinput[1:].zfill(4)
             else:
+                if not usrinput.isdigit():
+                    raise ValueError("Input must either signed 5 character or"
+                                     " unsigned 4 character word with 4 digits.")
                 usrinput = "+"+usrinput.zfill(4)
         else:
-             raise ValueError("Input must either signed 5 character or unsigned 4 character word with 4 digits.")
+            raise ValueError("Input must either signed 5 character or"
+                               " unsigned 4 character word with 4 digits.")
         self.memory[address] = usrinput
 
     def write(self, address):
