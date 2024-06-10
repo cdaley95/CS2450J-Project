@@ -41,12 +41,12 @@ Open a terminal and navigate to the directory containing `main.py` in the `src` 
 - **Multiplication (33)**: Multiplies a word from a specified memory address by the accumulator.
 - **Division (32)**: Divides the accumulator by a word from a specified memory address.
 
-## Special Handling of Overflow
+## Handling of Overflow
 
-When results exceed four digits, BasicML handles the overflow by wrapping around and flipping the sign. For example:
+When results exceed four digits, BasicML handles the overflow by truncating and keeping the same sign. For example:
 
-- `-9999 + -0002` results in `+0001`
-- `+9999 + +0002` results in `-0001`
+- `-9999 + -0002` results in `-0001`
+- `+9999 + +0002` results in `+0001`
 
 ## I/O operation:
 
