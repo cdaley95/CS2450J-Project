@@ -4,14 +4,16 @@ Contributors: Corey Daley, Josh Keyes, Steven Martins, Zachary Wilson
 Course: CS2450
 Group: J
 '''
-from tkinter import scrolledtext
-import tkinter as tk
 import os
+import tkinter as tk
+from tkinter import messagebox, scrolledtext
+
 
 class BasicML:
     '''Initialized with a 100 word memory and a single
     register named accumulator, as well as a dictionary
     for the opcodes'''
+
     def __init__(self):
         self.memory = ["+0000"]*100
         self.accumulator = "+0000"
@@ -62,28 +64,28 @@ class BasicML:
         if len(usrinput) == 5:
             if usrinput[0] not in ['+', '-']:
                 print("Error: 5 character input must be signed.")
-                self.pointer=100
+                self.pointer = 100
                 return
             if not usrinput[1:].isdigit():
                 print("Error: Input must be signed or unsigned word with digits.")
-                self.pointer=100
+                self.pointer = 100
                 return
         elif len(usrinput) <= 4:
             if usrinput[0] in ['+', '-']:
                 if not usrinput[1:].isdigit():
                     print("Error: Input must be signed or unsigned word with digits.")
-                    self.pointer=100
+                    self.pointer = 100
                     return
                 usrinput = "-"+usrinput[1:].zfill(4)
             else:
                 if not usrinput.isdigit():
                     print("Error: Input must be signed or unsigned word with digits.")
-                    self.pointer=100
+                    self.pointer = 100
                     return
                 usrinput = "+"+usrinput.zfill(4)
         else:
             print("Error: Input cannot have more than 5 characters.")
-            self.pointer=100
+            self.pointer = 100
             return
         self.memory[address] = usrinput
 
@@ -174,16 +176,19 @@ class BasicML:
             return word[0]+word[-4:]
         return word
 
+
 class BasicMLGUI():
     '''GUI for UVSim'''
+
     def __init__(self, ml, tkin):
         self.root = tkin
         self.ml = ml
 
         self.root.title("UVSim Machine Language Interpreter")
-        parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        parent_dir = os.path.dirname(
+            os.path.dirname(os.path.abspath(__file__)))
         imgdir = os.path.join(parent_dir, "files\\images\\icon.ico")
-        self.root.iconbitmap(imgdir)
+        # self.root.iconbitmap(imgdir) # Since icon.ico is not present, this line is commented out
 
         self.memory_frame = tk.Frame(self.root)
         self.memory_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -191,7 +196,8 @@ class BasicMLGUI():
         self.memory_label.pack(side=tk.TOP, pady=5)
         self.memory_list = tk.Listbox(self.memory_frame, width=10)
         self.memory_list.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        self.memory_scrollbar = tk.Scrollbar(self.memory_frame, command=self.memory_list.yview)
+        self.memory_scrollbar = tk.Scrollbar(self.memory_frame,
+                                             command=self.memory_list.yview)
         self.memory_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.memory_list.config(yscrollcommand=self.memory_scrollbar.set)
         for i in range(100):
@@ -206,22 +212,32 @@ class BasicMLGUI():
         self.pointer_entry.pack(side=tk.LEFT, padx=5)
         self.pointer_entry.insert(0, f"{self.ml.pointer:02}")
 
-        self.accumulator_label = tk.Label(self.control_frame, text="Accumulator")
+        self.accumulator_label = tk.Label(self.control_frame,
+                                          text="Accumulator")
         self.accumulator_label.pack(side=tk.LEFT, padx=5)
         self.accumulator_entry = tk.Entry(self.control_frame, width=6)
         self.accumulator_entry.pack(side=tk.LEFT, padx=5)
         self.accumulator_entry.insert(0, f"{self.ml.accumulator:02}")
 
-        self.buttons_frame = tk.Frame(self.root)
-        self.buttons_frame.pack(side = tk.TOP, fill=tk.X,)
+        self.update_button = tk.Button(self.control_frame,
+                                       text="Update",
+                                       command=self.update_pointer_and_accumulator)
+        self.update_button.pack(side=tk.LEFT, padx=5)
 
-        self.load_button = tk.Button(self.buttons_frame, text="Load File", command=self.load_file)
+        self.buttons_frame = tk.Frame(self.root)
+        self.buttons_frame.pack(side=tk.TOP, fill=tk.X,)
+
+        self.load_button = tk.Button(self.buttons_frame,
+                                     text="Load File",
+                                     command=self.load_file)
         self.load_button.pack(side=tk.LEFT, padx=5, pady=5)
         self.run_button = tk.Button(self.buttons_frame,
-                                     text="Run Program", command=self.run_program)
+                                    text="Run Program",
+                                    command=self.run_program)
         self.run_button.pack(side=tk.LEFT, padx=5, pady=5)
         self.step_button = tk.Button(self.buttons_frame,
-                                      text="Step Program", command=self.step_program)
+                                     text="Step Program",
+                                     command=self.step_program)
         self.step_button.pack(side=tk.LEFT, padx=5, pady=5)
 
         self.console_frame = tk.Frame(self.root)
@@ -229,7 +245,8 @@ class BasicMLGUI():
         self.console_label = tk.Label(self.console_frame, text="Console")
         self.console_label.pack(side=tk.TOP, pady=5)
         self.console_text = scrolledtext.ScrolledText(self.console_frame,
-                                                       height=10, state=tk.DISABLED)
+                                                      height=10,
+                                                      state=tk.DISABLED)
         self.console_text.pack(fill=tk.BOTH, expand=True)
 
         self.input_frame = tk.Frame(self.root)
@@ -237,8 +254,13 @@ class BasicMLGUI():
         self.input_label = tk.Label(self.input_frame, text="Input")
         self.input_label.pack(side=tk.LEFT, padx=5)
         self.input_entry_var = tk.StringVar()
-        self.input_entry = tk.Entry(self.input_frame, textvariable=self.input_entry_var)
-        self.input_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5, pady=5)
+        self.input_entry = tk.Entry(self.input_frame,
+                                    textvariable=self.input_entry_var)
+        self.input_entry.pack(side=tk.LEFT,
+                              fill=tk.X,
+                              expand=True,
+                              padx=5,
+                              pady=5)
 
     def load_file(self):
         pass
@@ -250,11 +272,23 @@ class BasicMLGUI():
     def step_program(self):
         pass
 
-    def update_pointer(self):
-        pass
+    def update_pointer_and_accumulator(self):
+        pointer_val = self.pointer_entry.get()
+        accumulator_val = self.accumulator_entry.get()
 
-    def update_accumulator(self):
-        pass
+        if not pointer_val.isdigit() or not (0 <= int(pointer_val) <= 99):
+            messagebox.showerror(
+                "Invalid Input", "Pointer must be a positive integer between 0 and 99.")
+        elif (not accumulator_val.startswith(('+', '-'))
+              or not accumulator_val[1:].isdigit()
+              or not (-9999 <= int(accumulator_val) <= 9999)):
+            messagebox.showerror(
+                "Invalid Input", "Accumulator must have a sign (+ or -) and be a number between -9999 and +9999.")
+        else:
+            self.ml.pointer = int(pointer_val)
+            self.ml.accumulator = accumulator_val
+            messagebox.showinfo("Success", (f"Pointer updated to: {self.ml.pointer:02}\n"
+                                            f"Accumulator updated to: {self.ml.accumulator}"))
 
     def update_memory(self):
         self.memory_list.delete(0, tk.END)
