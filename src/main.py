@@ -218,6 +218,10 @@ class BasicMLGUI():
         self.accumulator_entry.insert(0, f"{self.ml.accumulator}")
         self.accumulator_entry.bind("<Return>", self.update_accumulator_entry)
 
+        self.update_button = tk.Button(self.control_frame,
+                                       text="Update", command=self.update_both_entry)
+        self.update_button.pack(side=tk.LEFT, padx=5)
+
     def buttons(self):
         '''initialize buttons for load, run, and step'''
         self.buttons_frame = tk.Frame(self.root)
@@ -289,14 +293,22 @@ class BasicMLGUI():
             self.gui_output("File does not exist.")
             return
 
-    def reset_pointer_accumulator(self):
-        '''Reset pointer and accumulator to initial values'''
+    def reset_pointer(self):
+        '''reset pointer to initial value'''
         self.ml.pointer = 0
-        self.ml.accumulator = "+0000"
         self.pointer_entry.delete(0, tk.END)
         self.pointer_entry.insert(0, f"{self.ml.pointer:02}")
+
+    def reset_accumulator(self):
+        '''reset accumulator to initial value'''
+        self.ml.accumulator = "+0000"
         self.accumulator_entry.delete(0, tk.END)
         self.accumulator_entry.insert(0, f"{self.ml.accumulator}")
+
+    def reset_pointer_accumulator(self):
+        '''Reset pointer and accumulator to initial values'''
+        self.reset_accumulator()
+        self.reset_pointer()
 
     def run_program(self):
         '''runs program by iterating step program'''
@@ -320,13 +332,18 @@ class BasicMLGUI():
             update_pointer = int(self.pointer_entry.get())
             if 0 <= update_pointer < 100:
                 self.ml.pointer = update_pointer
-            else:
                 self.pointer_entry.delete(0, tk.END)
                 self.pointer_entry.insert(0, f"{self.ml.pointer:02}")
+            else:
+                self.reset_pointer()
         except ValueError:
-            self.pointer_entry.delete(0, tk.END)
-            self.pointer_entry.insert(0, f"{self.ml.pointer:02}")
+            self.reset_pointer()
         self.root.focus_set()
+
+    def update_both_entry(self):
+        '''update both accumulator and pointer'''
+        self.update_accumulator_entry("<Enter>")
+        self.update_pointer_entry("<Enter>")
 
     def update_accumulator_entry(self, _event):
         '''updates the accumulator for user modification'''
