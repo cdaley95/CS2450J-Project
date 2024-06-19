@@ -4,9 +4,10 @@ Contributors: Corey Daley, Josh Keyes, Steven Martins, Zachary Wilson
 Course: CS2450
 Group: J
 '''
-from tkinter import scrolledtext
+from tkinter import scrolledtext, filedialog
 import tkinter as tk
 import os
+import time
 
 class BasicML:
     '''Initialized with a 100 word memory and a single
@@ -16,6 +17,8 @@ class BasicML:
         self.memory = ["+0000"]*100
         self.accumulator = "+0000"
         self.pointer = 0
+        self.gui_input = input
+        self.gui_output = print
 
     def exec_instruction(self, instruction_code):
         '''Parses the code into the instruction and the memory location. 
@@ -25,28 +28,20 @@ class BasicML:
         match instruction:
             case "10":
                 self.read(memory_loc)
-                self.pointer += 1
             case "11":
                 self.write(memory_loc)
-                self.pointer += 1
             case "20":
                 self.load(memory_loc)
-                self.pointer += 1
             case "21":
                 self.store(memory_loc)
-                self.pointer += 1
             case "30":
                 self.add(memory_loc)
-                self.pointer += 1
             case "31":
                 self.subtract(memory_loc)
-                self.pointer += 1
             case "32":
                 self.divide(memory_loc)
-                self.pointer += 1
             case "33":
                 self.multiply(memory_loc)
-                self.pointer += 1
             case "40":
                 self.branch(memory_loc)
             case "41":
@@ -58,38 +53,38 @@ class BasicML:
 
     def read(self, address):
         'Reads a word from the terminal and stores it in memory'
-        usrinput = input(f"Word into memory location {address}: ")
+        usrinput = self.gui_input(f"Word into memory location {address}: ")
         if len(usrinput) == 5:
             if usrinput[0] not in ['+', '-']:
-                print("Error: 5 character input must be signed.")
+                self.gui_output("Error: 5 character input must be signed.")
                 self.pointer=100
                 return
             if not usrinput[1:].isdigit():
-                print("Error: Input must be signed or unsigned word with digits.")
+                self.gui_output("Error: Input must be signed or unsigned word with digits.")
                 self.pointer=100
                 return
         elif len(usrinput) <= 4:
             if usrinput[0] in ['+', '-']:
                 if not usrinput[1:].isdigit():
-                    print("Error: Input must be signed or unsigned word with digits.")
+                    self.gui_output("Error: Input must be signed or unsigned word with digits.")
                     self.pointer=100
                     return
-                usrinput = "-"+usrinput[1:].zfill(4)
+                usrinput = usrinput[0]+usrinput[1:].zfill(4)
             else:
                 if not usrinput.isdigit():
-                    print("Error: Input must be signed or unsigned word with digits.")
+                    self.gui_output("Error: Input must be signed or unsigned word with digits.")
                     self.pointer=100
                     return
                 usrinput = "+"+usrinput.zfill(4)
         else:
-            print("Error: Input cannot have more than 5 characters.")
+            self.gui_output("Error: Input cannot have more than 5 characters.")
             self.pointer=100
             return
         self.memory[address] = usrinput
 
     def write(self, address):
         'Writes a word from a location in memory to the screen'
-        print(self.memory[address])
+        self.gui_output(f"Output: {self.memory[address]}")
 
     def load(self, address):
         'Loads word from memory address into accumulator'
@@ -122,23 +117,17 @@ class BasicML:
     def branch(self, address):
         'Branches to a specific location in memory if accumulator is positive'
         if self.accumulator[0] == "+":
-            self.pointer = address
-        else:
-            self.pointer += 1
+            self.pointer = address - 1
 
     def branchneg(self, address):
         'Branches to a specific location in memory if the accumulator is negative'
         if self.accumulator[0] == "-":
-            self.pointer = address
-        else:
-            self.pointer += 1
+            self.pointer = address - 1
 
     def branchzero(self, address):
         'Branches to a specific location in memory if the accumulator is zero'
         if int(self.accumulator) == 0:
-            self.pointer = address
-        else:
-            self.pointer += 1
+            self.pointer = address - 1
 
     def halt(self):
         'Stops the program'
@@ -159,7 +148,7 @@ class BasicML:
         if int(word2) == 0:
             print("Error: Cannot divide by zero")
             self.pointer = 100
-            return
+            return None
         result = int(word1) // int(word2)
         return f"{result:+05d}"
 
@@ -179,14 +168,27 @@ class BasicMLGUI():
     def __init__(self, ml, tkin):
         self.root = tkin
         self.ml = ml
+        self.ml.gui_output = self.gui_output
+        self.ml.gui_input = self.gui_input
 
+        self.gui_window()
+        self.memory_display()
+        self.pointer_and_accumulator()
+        self.buttons()
+        self.console_and_input()
+        self.input_received = False
+
+    def gui_window(self):
+        '''initialize GUI window'''
         self.root.title("UVSim Machine Language Interpreter")
         parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         imgdir = os.path.join(parent_dir, "files\\images\\icon.ico")
         self.root.iconbitmap(imgdir)
 
+    def memory_display(self):
+        '''initialize memory display'''
         self.memory_frame = tk.Frame(self.root)
-        self.memory_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.memory_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5)
         self.memory_label = tk.Label(self.memory_frame, text="Program Memory")
         self.memory_label.pack(side=tk.TOP, pady=5)
         self.memory_list = tk.Listbox(self.memory_frame, width=10)
@@ -197,40 +199,53 @@ class BasicMLGUI():
         for i in range(100):
             self.memory_list.insert(tk.END, f"{i:02}: {self.ml.memory[i]}")
 
+    def pointer_and_accumulator(self):
+        '''initialize pointer and accumulator display and edit'''
         self.control_frame = tk.Frame(self.root)
         self.control_frame.pack(side=tk.TOP, fill=tk.X)
 
         self.pointer_label = tk.Label(self.control_frame, text="Pointer")
         self.pointer_label.pack(side=tk.LEFT, padx=5)
-        self.pointer_entry = tk.Entry(self.control_frame, width=2)
+        self.pointer_entry = tk.Entry(self.control_frame, width=3)
         self.pointer_entry.pack(side=tk.LEFT, padx=5)
         self.pointer_entry.insert(0, f"{self.ml.pointer:02}")
+        self.pointer_entry.bind("<Return>", self.update_pointer_entry)
 
         self.accumulator_label = tk.Label(self.control_frame, text="Accumulator")
         self.accumulator_label.pack(side=tk.LEFT, padx=5)
         self.accumulator_entry = tk.Entry(self.control_frame, width=6)
         self.accumulator_entry.pack(side=tk.LEFT, padx=5)
-        self.accumulator_entry.insert(0, f"{self.ml.accumulator:02}")
+        self.accumulator_entry.insert(0, f"{self.ml.accumulator}")
+        self.accumulator_entry.bind("<Return>", self.update_accumulator_entry)
 
+    def buttons(self):
+        '''initialize buttons for load, run, and step'''
         self.buttons_frame = tk.Frame(self.root)
         self.buttons_frame.pack(side = tk.TOP, fill=tk.X,)
 
         self.load_button = tk.Button(self.buttons_frame, text="Load File", command=self.load_file)
         self.load_button.pack(side=tk.LEFT, padx=5, pady=5)
+
         self.run_button = tk.Button(self.buttons_frame,
                                      text="Run Program", command=self.run_program)
         self.run_button.pack(side=tk.LEFT, padx=5, pady=5)
+
         self.step_button = tk.Button(self.buttons_frame,
                                       text="Step Program", command=self.step_program)
         self.step_button.pack(side=tk.LEFT, padx=5, pady=5)
 
+    def console_and_input(self):
+        '''initialize console and input'''
         self.console_frame = tk.Frame(self.root)
-        self.console_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        self.console_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=5)
         self.console_label = tk.Label(self.console_frame, text="Console")
         self.console_label.pack(side=tk.TOP, pady=5)
         self.console_text = scrolledtext.ScrolledText(self.console_frame,
                                                        height=10, state=tk.DISABLED)
         self.console_text.pack(fill=tk.BOTH, expand=True)
+        self.console_clearbutton = tk.Button(self.console_frame,
+                                              text="Clear Console", command=self.clear_console)
+        self.console_clearbutton.pack(side=tk.BOTTOM, pady=5)
 
         self.input_frame = tk.Frame(self.root)
         self.input_frame.pack(side=tk.TOP, fill=tk.X)
@@ -239,64 +254,158 @@ class BasicMLGUI():
         self.input_entry_var = tk.StringVar()
         self.input_entry = tk.Entry(self.input_frame, textvariable=self.input_entry_var)
         self.input_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5, pady=5)
+        self.input_entry.bind("<Return>", self.handle_enter)
+
+        self.input_entry_button = tk.Button(self.input_frame,
+                                             text="Enter", command=self.enter_button)
+        self.input_entry_button.pack(side=tk.LEFT)
 
     def load_file(self):
-        pass
+        '''method for loading file from button click'''
+        source_location = filedialog.askopenfilename()
+        if source_location:
+            with open(source_location,'r', encoding='utf-8') as file:
+                # Reading lines
+                lines = file.readlines()
+                # Adding lines to memory
+                for line_index, line in enumerate(lines):
+                    stripped_line = line.rstrip('\n')
+                    if len(stripped_line) != 5:
+                        self.gui_output("File contents are not in correct format")
+                        self.update_memory()
+                        return
+                    if stripped_line[0] not in ['+','-']:
+                        self.gui_output("File contents are not in correct format")
+                        self.update_memory()
+                        return
+                    if not stripped_line[1:].isdigit():
+                        self.gui_output("File contents are not in correct format")
+                        self.update_memory()
+                        return
+                    self.ml.memory[line_index] = stripped_line
+                self.update_memory()
+                self.reset_pointer_accumulator()
+        else:
+            self.gui_output("File does not exist.")
+            return
+
+    def reset_pointer_accumulator(self):
+        '''Reset pointer and accumulator to initial values'''
+        self.ml.pointer = 0
+        self.ml.accumulator = "+0000"
+        self.pointer_entry.delete(0, tk.END)
+        self.pointer_entry.insert(0, f"{self.ml.pointer:02}")
+        self.accumulator_entry.delete(0, tk.END)
+        self.accumulator_entry.insert(0, f"{self.ml.accumulator}")
 
     def run_program(self):
-        '''while int(self.ml.accumulator) < 100:
-            self.step_program()'''
+        '''runs program by iterating step program'''
+        while int(self.ml.pointer) <= 99:
+            self.step_program()
 
     def step_program(self):
-        pass
+        '''steps the program with one instruction'''
+        if self.ml.pointer < 100:
+            self.ml.exec_instruction(self.ml.memory[self.ml.pointer])
+            self.update_memory()
+            self.pointer_entry.delete(0, tk.END)
+            self.pointer_entry.insert(0, f"{self.ml.pointer:02}")
+            self.accumulator_entry.delete(0, tk.END)
+            self.accumulator_entry.insert(0, f"{self.ml.accumulator}")
+            self.ml.pointer += 1
 
-    def update_pointer(self):
-        pass
+    def update_pointer_entry(self, _event):
+        '''updates the pointer for user modification'''
+        try:
+            update_pointer = int(self.pointer_entry.get())
+            if 0 <= update_pointer < 100:
+                self.ml.pointer = update_pointer
+            else:
+                self.pointer_entry.delete(0, tk.END)
+                self.pointer_entry.insert(0, f"{self.ml.pointer:02}")
+        except ValueError:
+            self.pointer_entry.delete(0, tk.END)
+            self.pointer_entry.insert(0, f"{self.ml.pointer:02}")
+        self.root.focus_set()
 
-    def update_accumulator(self):
-        pass
+    def update_accumulator_entry(self, _event):
+        '''updates the accumulator for user modification'''
+        try:
+            update_accumulator = self.accumulator_entry.get()
+            if -9999<= int(update_accumulator) <= 9999:
+                if len(update_accumulator) < 5:
+                    if update_accumulator[0] in ["-", "+"]:
+                        update_accumulator = update_accumulator[0]+update_accumulator[1:].zfill(4)
+                    else:
+                        update_accumulator = "+"+update_accumulator.zfill(4)
+                self.ml.accumulator=update_accumulator
+            else:
+                self.accumulator_entry.delete(0, tk.END)
+                self.accumulator_entry.insert(0, f"{self.ml.accumulator}")
+        except ValueError:
+            self.accumulator_entry.delete(0, tk.END)
+            self.accumulator_entry.insert(0, f"{self.ml.accumulator}")
+        self.accumulator_entry.delete(0, tk.END)
+        self.accumulator_entry.insert(0, f"{self.ml.accumulator}")
+        self.root.focus_set()
+
+    def gui_output(self, output):
+        '''output widget logic'''
+        self.console_text.config(state=tk.NORMAL)
+        self.console_text.insert(tk.END, output + "\n")
+        self.console_text.config(state=tk.DISABLED)
+        self.console_text.see(tk.END)
+
+    def clear_console(self):
+        '''clears console'''
+        self.console_text.config(state=tk.NORMAL)
+        self.console_text.delete(1.0, tk.END)
+        self.console_text.config(state=tk.DISABLED)
+
+    def gui_input(self, prompt):
+        '''input entry logic'''
+        self.gui_output(prompt)
+
+        self.input_entry_var.set("")
+        self.input_entry.focus_set()
+
+        self.input_received = False
+
+        while not self.input_received:
+            self.root.update()
+            time.sleep(0.1)
+
+        input_value = self.input_entry_var.get()
+        if input_value == "":
+            input_value = "+0000"
+        elif input_value.isdigit() and len(input_value)<5:
+            input_value = "+"+input_value.zfill(4)
+        elif input_value[0] == "-" and len(input_value)<6:
+            input_value = "-"+input_value[1:].zfill(4)
+        else:
+            pass
+        self.input_entry_var.set("")
+
+        self.console_text.config(state=tk.NORMAL)
+        self.console_text.insert(tk.END, "Input: "+input_value+"\n")
+        self.console_text.config(state=tk.DISABLED)
+        self.console_text.see(tk.END)
+
+        return input_value
+
+    def handle_enter(self, _event):
+        '''handles enter key input for user input'''
+        self.input_received = True
+
+    def enter_button(self):
+        '''enter button logic... yeah.'''
+        self.input_received = True
 
     def update_memory(self):
+        '''updates memory in memory display'''
         self.memory_list.delete(0, tk.END)
         for i in range(100):
             self.memory_list.insert(tk.END, f"{i:02}: {self.ml.memory[i]}")
-
-
-'''def main():
-    ''''''main method docstring
-    basic_ml = BasicML()
-    # TODO Allow for file input
-    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    source_location = os.path.join(parent_dir, "files", input("Name of file: "))
-    print(source_location)
-    # source_location = "test.txt"
-
-    # Reading and adding lines to memory
-    try:
-        with open(source_location, 'r') as file:
-            # Reading lines
-            lines = file.readlines()
-            # Adding lines to memory
-            for line_index, line in enumerate(lines):
-                stripped_line = line.rstrip('\n')
-                if len(stripped_line) != 5:
-                    raise ValueError("File contents are not in correct format")
-                if stripped_line[0] not in ['+','-']:
-                    raise ValueError("File contents are not in correct format")
-                if not stripped_line[1:].isdigit():
-                    raise ValueError("File contents are not in correct format")
-                basic_ml.memory[line_index] = stripped_line
-    except FileNotFoundError:
-        print("Not a valid file location.")
-        return
-    except ValueError as e:
-        print(e)
-        return
-    # Executing lines from memory
-    while basic_ml.pointer != 100:
-        basic_ml.exec_instruction(basic_ml.memory[int(basic_ml.pointer)])
-    print("\nFinished.")'''
-
 
 if __name__ == "__main__":
     root = tk.Tk()
