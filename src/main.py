@@ -182,7 +182,7 @@ class BasicMLGUI():
         '''initialize GUI window'''
         self.root.title("UVSim Machine Language Interpreter")
         parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        imgdir = os.path.join(parent_dir, "files\\images\\icon.ico")
+        imgdir = os.path.join(parent_dir, "files","images","icon.ico")
         self.root.iconbitmap(imgdir)
 
     def memory_display(self):
