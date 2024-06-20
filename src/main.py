@@ -261,7 +261,7 @@ class BasicMLGUI():
         self.input_label = tk.Label(self.input_frame, text="Input")
         self.input_label.pack(side=tk.LEFT, padx=5)
         self.input_entry_var = tk.StringVar()
-        self.input_entry = tk.Entry(self.input_frame, textvariable=self.input_entry_var)
+        self.input_entry = tk.Entry(self.input_frame, textvariable=self.input_entry_var, state=tk.DISABLED)
         self.input_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5, pady=5)
         self.input_entry.bind("<Return>", self.handle_enter)
 
@@ -387,6 +387,7 @@ class BasicMLGUI():
     def gui_input(self, prompt):
         '''input entry logic'''
         self.gui_output(prompt)
+        self.input_entry.config(state=tk.NORMAL)
 
         self.input_entry_var.set("")
         self.input_entry.focus_set()
@@ -407,6 +408,7 @@ class BasicMLGUI():
         else:
             pass
         self.input_entry_var.set("")
+        self.input_entry.config(state=tk.DISABLED)
 
         self.console_text.config(state=tk.NORMAL)
         self.console_text.insert(tk.END, "Input: "+input_value+"\n")
