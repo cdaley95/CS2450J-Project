@@ -132,6 +132,7 @@ class BasicML:
     def halt(self):
         'Stops the program'
         self.pointer = 100
+        self.gui_output(" - - Halted Program - - ")
 
     def add_words(self, word1, word2):
         'Converts words to int, sums together, then returns string conversion'
@@ -221,6 +222,9 @@ class BasicMLGUI():
         self.update_button = tk.Button(self.control_frame,
                                        text="Update", command=self.update_both_entry)
         self.update_button.pack(side=tk.LEFT, padx=5)
+        self.reset_button = tk.Button(self.control_frame,
+                                       text="Reset", command=self.reset_pointer_accumulator(True))
+        self.reset_button.pack(side=tk.LEFT, padx=5)
 
     def buttons(self):
         '''initialize buttons for load, run, and step'''
@@ -305,10 +309,15 @@ class BasicMLGUI():
         self.accumulator_entry.delete(0, tk.END)
         self.accumulator_entry.insert(0, f"{self.ml.accumulator}")
 
-    def reset_pointer_accumulator(self):
+    def reset_pointer_accumulator(self, clear_console=False):
         '''Reset pointer and accumulator to initial values'''
         self.reset_accumulator()
         self.reset_pointer()
+        try:
+            if clear_console is True:
+                self.clear_console()
+        except AttributeError:
+            pass
 
     def run_program(self):
         '''runs program by iterating step program'''
