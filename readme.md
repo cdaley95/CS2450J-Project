@@ -2,7 +2,7 @@
 
 ## Overview
 
-BasicML is a simple virtual machine that simulates a basic machine language. It operates with a memory of 100 words and a single accumulator register. The program supports various operations such as loading, storing, adding, subtracting, multiplying, and dividing values. This document provides an overview of the program, its operations, and instructions for usage.
+BasicML is a simple virtual machine that simulates a basic machine language using python and tkinter. It operates with a memory of 100 words and a single accumulator register. The program supports various operations such as loading, storing, adding, subtracting, multiplying, and dividing values. This document provides an overview of the program, its operations, and instructions for usage.
 
 ## Features
 
@@ -12,11 +12,13 @@ BasicML is a simple virtual machine that simulates a basic machine language. It 
 - Handles overflow by wrapping around and flipping the sign
 - Supports load and store operations
 - Supports control operations: halt, branch, branchneg, branchzero
+- Full graphical functionality
 
 ## Installation
 
 1. Ensure you have Python installed on your machine.
-2. Clone the repository to your local machine.
+2. Ensure that tkinter is installed before executing.
+3. Clone the repository to your local machine.
 
 ## Usage
 
@@ -25,7 +27,7 @@ BasicML is a simple virtual machine that simulates a basic machine language. It 
 
 ## Running the Program
 
-Open a terminal and navigate to the directory containing `main.py` in the `src` folder for the project.
+Open a terminal and navigate to the directory containing `main.py` in the `src` folder for the project and execute `main.py`.
 
 ## What the program does/can do
 
@@ -64,3 +66,10 @@ When results exceed four digits, BasicML handles the overflow by truncating and 
 - **BRANCHNEG = 41** Branch to a specific location in memory if the accumulator is negative.
 - **BRANCHZERO = 42** Branch to a specific location in memory if the accumulator is zero.
 - **HALT = 43** Stop the program
+
+## GUI file execution tutorial:
+- After running the file by executing `main.py` and ensuring that tkinter is installed on your machine, click the `Load File` button in the upper left hand corner.
+- Select file to execute.
+- Click the `Run Program` file. The application will then follow the instructions in the instruction file and display its contents to the console.
+- Clicking the `Update` button will update the accumulator and the pointer with the values in the pointer and accumulator. Pressing enter in the accumulator and pointer fields does the same thing.
+- Clicking the `Step` button will run one instruction per click.
