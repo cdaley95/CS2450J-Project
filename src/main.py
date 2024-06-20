@@ -56,29 +56,29 @@ class BasicML:
         usrinput = self.gui_input(f"Word into memory location {address}: ")
         if len(usrinput) == 5:
             if usrinput[0] not in ['+', '-']:
-                self.gui_output("Error: 5 character input must be signed.")
-                self.pointer=100
+                self.gui_output("Error: 5 character input must be signed 4 digit number.")
+                self.halt()
                 return
             if not usrinput[1:].isdigit():
                 self.gui_output("Error: Input must be signed or unsigned word with digits.")
-                self.pointer=100
+                self.halt()
                 return
         elif len(usrinput) <= 4:
             if usrinput[0] in ['+', '-']:
                 if not usrinput[1:].isdigit():
                     self.gui_output("Error: Input must be signed or unsigned word with digits.")
-                    self.pointer=100
+                    self.halt()
                     return
                 usrinput = usrinput[0]+usrinput[1:].zfill(4)
             else:
                 if not usrinput.isdigit():
                     self.gui_output("Error: Input must be signed or unsigned word with digits.")
-                    self.pointer=100
+                    self.halt()
                     return
                 usrinput = "+"+usrinput.zfill(4)
         else:
             self.gui_output("Error: Input cannot have more than 5 characters.")
-            self.pointer=100
+            self.halt()
             return
         self.memory[address] = usrinput
 
