@@ -75,6 +75,7 @@ When results exceed four digits, BasicML handles the overflow by truncating and 
 - **HALT = 43** Stop the program
 
 ## GUI file execution tutorial:
+![Annotated application screenshot](product_preview_annotated.png)
 - After running the file by executing `main.py` and ensuring that tkinter is installed on your machine, click the `Load File` button in the upper left hand corner.
 - Select file to execute.
 - Click the `Run Program` file. The application will then follow the instructions in the instruction file and display its contents to the console.
