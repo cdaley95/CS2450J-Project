@@ -431,8 +431,12 @@ class BasicMLGUI():
         for i in range(100):
             self.memory_list.insert(tk.END, f"{i:02}: {self.ml.memory[i]}")
 
-if __name__ == "__main__":
+def main():
+    '''main function to run the mainloop'''
     root = tk.Tk()
     mlInstance = BasicML()
     gui = BasicMLGUI(mlInstance, root)
     root.mainloop()
+
+if __name__ == "__main__":
+    main()
