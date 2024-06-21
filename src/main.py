@@ -223,7 +223,8 @@ class BasicMLGUI():
                                        text="Update", command=self.update_both_entry)
         self.update_button.pack(side=tk.LEFT, padx=5)
         self.reset_button = tk.Button(self.control_frame,
-                                       text="Reset", command=lambda:(self.reset_pointer_accumulator(),
+                                       text="Reset",
+                                          command=lambda:(self.reset_pointer_accumulator(),
                                                                     self.clear_console()))
         self.reset_button.pack(side=tk.LEFT, padx=5)
 
@@ -261,7 +262,8 @@ class BasicMLGUI():
         self.input_label = tk.Label(self.input_frame, text="Input")
         self.input_label.pack(side=tk.LEFT, padx=5)
         self.input_entry_var = tk.StringVar()
-        self.input_entry = tk.Entry(self.input_frame, textvariable=self.input_entry_var, state=tk.DISABLED)
+        self.input_entry = tk.Entry(self.input_frame,
+                                     textvariable=self.input_entry_var, state=tk.DISABLED)
         self.input_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5, pady=5)
         self.input_entry.bind("<Return>", self.handle_enter)
 
@@ -434,8 +436,8 @@ class BasicMLGUI():
 def main():
     '''main function to run the mainloop'''
     root = tk.Tk()
-    mlInstance = BasicML()
-    gui = BasicMLGUI(mlInstance, root)
+    ml_instance = BasicML()
+    gui = BasicMLGUI(ml_instance, root) # noqa: F841
     root.mainloop()
 
 if __name__ == "__main__":
