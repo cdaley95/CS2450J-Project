@@ -6,6 +6,9 @@
 
 BasicML is a simple virtual machine that simulates a basic machine language using python and tkinter. It operates with a memory of 100 words and a single accumulator register. The program supports various operations such as loading, storing, adding, subtracting, multiplying, and dividing values. This document provides an overview of the program, its operations, and instructions for usage.
 
+![Class Definition](class_definition.png)
+
+
 ## Features
 
 - 100-word memory
@@ -37,6 +40,8 @@ Open a terminal and navigate to the directory containing `main.py` in the `src` 
 - Adds a value from another memory address to the accumulator.
 - Stores the result in a different memory address.
 - Prints the memory and accumulator values after execution.
+
+
 
 ## Arithmetic Operations
 
