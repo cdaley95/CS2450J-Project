@@ -1,5 +1,7 @@
 # BasicML
 
+![Application Screenshot](product_preview.png)
+
 ## Overview
 
 BasicML is a simple virtual machine that simulates a basic machine language using python and tkinter. It operates with a memory of 100 words and a single accumulator register. The program supports various operations such as loading, storing, adding, subtracting, multiplying, and dividing values. This document provides an overview of the program, its operations, and instructions for usage.
@@ -72,4 +74,6 @@ When results exceed four digits, BasicML handles the overflow by truncating and 
 - Select file to execute.
 - Click the `Run Program` file. The application will then follow the instructions in the instruction file and display its contents to the console.
 - Clicking the `Update` button will update the accumulator and the pointer with the values in the pointer and accumulator. Pressing enter in the accumulator and pointer fields does the same thing.
-- Clicking the `Step` button will run one instruction per click.
+- Clicking the `Step Program` button will run one instruction per click.
+- Clicking the `Reset` button will clear the console and reset the pointer and accumulator.
+- Clicking `Clear Console` will clear the content stored in the console.
