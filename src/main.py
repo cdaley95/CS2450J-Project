@@ -50,6 +50,7 @@ class BasicML:
                 self.branchzero(memory_loc)
             case "43":
                 self.halt()
+        self.pointer+=1
 
     def read(self, address):
         'Reads a word from the terminal and stores it in memory'
@@ -131,7 +132,7 @@ class BasicML:
 
     def halt(self):
         'Stops the program'
-        self.pointer = 100
+        self.pointer = 99
         self.gui_output(" - - Halted Program - - ")
 
     def add_words(self, word1, word2):
@@ -343,7 +344,6 @@ class BasicMLGUI():
             self.pointer_entry.insert(0, f"{self.ml.pointer:02}")
             self.accumulator_entry.delete(0, tk.END)
             self.accumulator_entry.insert(0, f"{self.ml.accumulator}")
-            self.ml.pointer += 1
 
     def update_pointer_entry(self, _event):
         '''updates the pointer for user modification'''
