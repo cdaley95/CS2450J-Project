@@ -237,7 +237,11 @@ class BasicMLGUI():
         self.load_button.pack(side=tk.LEFT, padx=5, pady=5)
 
         self.run_button = tk.Button(self.buttons_frame,
-                                     text="Run Program", command=self.run_program)
+                                     text="Run Program from Start", command=self.run_fromstart)
+        self.run_button.pack(side=tk.LEFT, padx=5, pady=5)
+
+        self.run_button = tk.Button(self.buttons_frame,
+                                     text="Continue Program from Pointer", command=self.run_program)
         self.run_button.pack(side=tk.LEFT, padx=5, pady=5)
 
         self.step_button = tk.Button(self.buttons_frame,
@@ -273,6 +277,9 @@ class BasicMLGUI():
 
     def load_file(self):
         '''method for loading file from button click'''
+        self.ml.memory = ["+0000"]*100
+        self.update_memory()
+        self.reset_pointer_accumulator()
         source_location = filedialog.askopenfilename()
         if source_location:
             with open(source_location,'r', encoding='utf-8') as file:
@@ -317,8 +324,13 @@ class BasicMLGUI():
         self.reset_accumulator()
         self.reset_pointer()
 
+    def run_fromstart(self):
+        '''runs program from stert'''
+        self.reset_pointer_accumulator()
+        self.run_program()
+
     def run_program(self):
-        '''runs program by iterating step program'''
+        '''runs program form current pointer location by iterating step program'''
         while int(self.ml.pointer) <= 99:
             self.step_program()
 
@@ -438,7 +450,7 @@ def main():
     root = tk.Tk()
     ml_instance = BasicML()
     gui = BasicMLGUI(ml_instance, root) # noqa: F841
-    root.mainloop()
+    gui.root.mainloop()
 
 if __name__ == "__main__":
     main()
