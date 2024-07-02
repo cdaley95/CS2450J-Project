@@ -231,21 +231,24 @@ class BasicMLGUI():
 
     def buttons(self):
         '''initialize buttons for load, run, and step'''
-        self.buttons_frame = tk.Frame(self.root)
-        self.buttons_frame.pack(side = tk.TOP, fill=tk.X,)
+        self.buttons1_frame = tk.Frame(self.root)
+        self.buttons1_frame.pack(side = tk.TOP, fill=tk.X,)
 
-        self.load_button = tk.Button(self.buttons_frame, text="Load File", command=self.load_file)
+        self.load_button = tk.Button(self.buttons1_frame, text="Load File", command=self.load_file)
         self.load_button.pack(side=tk.LEFT, padx=5, pady=5)
+        self.save_button = tk.Button(self.buttons1_frame, text="Save File", command=self.save_file)
+        self.save_button.pack(side=tk.LEFT, padx=5, pady=5)
 
-        self.run_button = tk.Button(self.buttons_frame,
+        self.buttons2_frame = tk.Frame(self.root)
+        self.buttons2_frame.pack(side = tk.TOP, fill=tk.X,)
+
+        self.run_button = tk.Button(self.buttons2_frame,
                                      text="Run Program from Start", command=self.run_fromstart)
         self.run_button.pack(side=tk.LEFT, padx=5, pady=5)
-
-        self.run_button = tk.Button(self.buttons_frame,
+        self.continue_button = tk.Button(self.buttons2_frame,
                                      text="Continue Program from Pointer", command=self.run_program)
-        self.run_button.pack(side=tk.LEFT, padx=5, pady=5)
-
-        self.step_button = tk.Button(self.buttons_frame,
+        self.continue_button.pack(side=tk.LEFT, padx=5, pady=5)
+        self.step_button = tk.Button(self.buttons2_frame,
                                       text="Step Program", command=self.step_program)
         self.step_button.pack(side=tk.LEFT, padx=5, pady=5)
 
@@ -307,6 +310,17 @@ class BasicMLGUI():
         else:
             self.gui_output("File does not exist.")
             return
+
+    def save_file(self):
+        '''saves a file from memory location'''
+        filename = filedialog.asksaveasfilename(filetypes=(("Text files", "*.txt"), ),
+                                                 defaultextension=".txt")
+        filename = filename if ".txt" in filename else filename + ".txt"
+        if filename is None:
+            return
+        with open(filename, 'w', encoding="utf-8") as output:
+            for row in self.ml.memory:
+                output.write(str(row)+"\n")
 
     def reset_pointer(self):
         '''reset pointer to initial value'''
