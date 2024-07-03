@@ -281,10 +281,12 @@ class BasicMLGUI():
 
     def load_file(self):
         '''method for loading file from button click'''
+        source_location = filedialog.askopenfilename()
+        if source_location == '':
+            return
         self.ml.memory = ["+0000"]*100
         self.update_memory()
         self.reset_pointer_accumulator()
-        source_location = filedialog.askopenfilename()
         if source_location:
             with open(source_location,'r', encoding='utf-8') as file:
                 # Reading lines
@@ -315,9 +317,9 @@ class BasicMLGUI():
         '''saves a file from memory location'''
         filename = filedialog.asksaveasfilename(filetypes=(("Text files", "*.txt"), ),
                                                  defaultextension=".txt")
-        filename = filename if ".txt" in filename else filename + ".txt"
-        if filename is None:
+        if filename == '':
             return
+        filename = filename if ".txt" in filename else filename + ".txt"
         with open(filename, 'w', encoding="utf-8") as output:
             for row in self.ml.memory:
                 output.write(str(row)+"\n")
@@ -463,7 +465,7 @@ def main():
     '''main function to run the mainloop'''
     root = tk.Tk()
     ml_instance = BasicML()
-    gui = BasicMLGUI(ml_instance, root) # noqa: F841
+    gui = BasicMLGUI(ml_instance, root)
     gui.root.mainloop()
 
 if __name__ == "__main__":
