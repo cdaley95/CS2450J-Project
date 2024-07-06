@@ -165,10 +165,10 @@ class BasicML:
             return word[0]+word[-4:]
         return word
 
-class BasicMLGUI():
+class BasicMLGUI:
     '''GUI for UVSim'''
-    def __init__(self, ml, tkin):
-        self.root = tkin
+    def __init__(self, ml):
+        self.root = tk.Tk()
         self.ml = ml
         self.ml.gui_output = self.gui_output
         self.ml.gui_input = self.gui_input
@@ -179,6 +179,10 @@ class BasicMLGUI():
         self.buttons()
         self.console_and_input()
         self.input_received = False
+
+    def start(self):
+        '''Starts the GUI'''
+        self.root.mainloop()
 
     def gui_window(self):
         '''initialize GUI window'''
@@ -463,10 +467,9 @@ class BasicMLGUI():
 
 def main():
     '''main function to run the mainloop'''
-    root = tk.Tk()
     ml_instance = BasicML()
-    gui = BasicMLGUI(ml_instance, root)
-    gui.root.mainloop()
+    gui = BasicMLGUI(ml_instance)
+    gui.start()
 
 if __name__ == "__main__":
     main()
