@@ -184,7 +184,7 @@ class MemoryDisplay:
         self.memory_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.memory_list.config(yscrollcommand=self.memory_scrollbar.set)
         for i in range(100):
-                self.memory_list.insert(tk.END, f"{i:02}: {self.ml.memory[i]}")
+            self.memory_list.insert(tk.END, f"{i:02}: {self.ml.memory[i]}")
 
     def update_memory(self):
         '''updates memory in memory display'''
@@ -266,10 +266,10 @@ class PointAccumDisplay:
             update_accumulator = self.accumulator_entry.get()
             if -9999<= int(update_accumulator) <= 9999:
                 if len(update_accumulator) < 5:
-                        if update_accumulator[0] in ["-", "+"]:
-                            update_accumulator = update_accumulator[0]+update_accumulator[1:].zfill(4)
-                        else:
-                            update_accumulator = "+"+update_accumulator.zfill(4)
+                    if update_accumulator[0] in ["-", "+"]:
+                        update_accumulator = update_accumulator[0]+update_accumulator[1:].zfill(4)
+                    else:
+                        update_accumulator = "+"+update_accumulator.zfill(4)
                 self.ml.accumulator=update_accumulator
             else:
                 self.accumulator_entry.delete(0, tk.END)
@@ -287,6 +287,7 @@ class PointAccumDisplay:
         self.update_pointer_entry()
 
 class Controls:
+    '''Controls frame class'''
     def __init__(self, root, ml, memory, poiaccu, outin):
         self.root = root
         self.ml = ml
@@ -362,7 +363,7 @@ class Controls:
             return
         filename = filename if ".txt" in filename else filename + ".txt"
         with open(filename, 'w', encoding="utf-8") as output:
-              for row in self.ml.memory:
+            for row in self.ml.memory:
                 output.write(str(row)+"\n")
 
     def run_fromstart(self):
@@ -386,6 +387,7 @@ class Controls:
             self.poiaccu.accumulator_entry.insert(0, f"{self.ml.accumulator}")
 
 class ConsoleInputDisplay:
+    '''Console and input class'''
     def __init__(self, root, ml):
         self.root = root
         self.ml = ml
@@ -405,7 +407,7 @@ class ConsoleInputDisplay:
         self.input_entry_button = tk.Button(self.input_frame,
                             text="Enter", command=self.handle_enter)
         self.input_received = False
-        
+
     def launch(self):
         '''initializes input and output frame'''
         self.console_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=5)
@@ -469,6 +471,7 @@ class ConsoleInputDisplay:
         self.input_received = True
 
 class BasicMLGUI:
+    '''Main GUI class'''
     def __init__(self, ml):
         self.root = tk.Tk()
         self.ml = ml
@@ -476,7 +479,7 @@ class BasicMLGUI:
         self.poiaccu = PointAccumDisplay(self.root, self.ml)
         self.outin = ConsoleInputDisplay(self.root, self.ml)
         self.controls = Controls(self.root, self.ml, self.memory, self.poiaccu, self.outin)
-        
+
     def start(self):
         '''sets up GUI window and runs mainloop'''
         self.root.title("UVSim Machine Language Interpreter")
