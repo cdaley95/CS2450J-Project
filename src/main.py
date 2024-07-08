@@ -17,8 +17,8 @@ class BasicML:
         self.memory = ["+0000"]*100
         self.accumulator = "+0000"
         self.pointer = 0
-        self.gui_input = input
-        self.gui_output = print
+        self.input = input
+        self.print = print
 
     def exec_instruction(self, instruction_code):
         '''Parses the code into the instruction and the memory location. 
@@ -54,38 +54,38 @@ class BasicML:
 
     def read(self, address):
         'Reads a word from the terminal and stores it in memory'
-        usrinput = self.gui_input(f"Word into memory location {address}: ")
+        usrinput = self.input(f"Word into memory location {address}: ")
         if len(usrinput) == 5:
             if usrinput[0] not in ['+', '-']:
-                self.gui_output("Error: 5 character input must be signed 4 digit number.")
+                self.print("Error: 5 character input must be signed 4 digit number.")
                 self.halt()
                 return
             if not usrinput[1:].isdigit():
-                self.gui_output("Error: Input must be signed or unsigned word with digits.")
+                self.print("Error: Input must be signed or unsigned word with digits.")
                 self.halt()
                 return
         elif len(usrinput) <= 4:
             if usrinput[0] in ['+', '-']:
                 if not usrinput[1:].isdigit():
-                    self.gui_output("Error: Input must be signed or unsigned word with digits.")
+                    self.print("Error: Input must be signed or unsigned word with digits.")
                     self.halt()
                     return
                 usrinput = usrinput[0]+usrinput[1:].zfill(4)
             else:
                 if not usrinput.isdigit():
-                    self.gui_output("Error: Input must be signed or unsigned word with digits.")
+                    self.print("Error: Input must be signed or unsigned word with digits.")
                     self.halt()
                     return
                 usrinput = "+"+usrinput.zfill(4)
         else:
-            self.gui_output("Error: Input cannot have more than 5 characters.")
+            self.print("Error: Input cannot have more than 5 characters.")
             self.halt()
             return
         self.memory[address] = usrinput
 
     def write(self, address):
         'Writes a word from a location in memory to the screen'
-        self.gui_output(f"Output: {self.memory[address]}")
+        self.print(f"Output: {self.memory[address]}")
 
     def load(self, address):
         'Loads word from memory address into accumulator'
@@ -133,7 +133,7 @@ class BasicML:
     def halt(self):
         'Stops the program'
         self.pointer = 99
-        self.gui_output(" - - Halted Program - - ")
+        self.print(" - - Halted Program - - ")
 
     def add_words(self, word1, word2):
         'Converts words to int, sums together, then returns string conversion'
@@ -148,7 +148,7 @@ class BasicML:
     def divide_words(self, word1, word2):
         'Converts words to int, divides, then returns string conversion'
         if int(word2) == 0:
-            print("Error: Cannot divide by zero")
+            self.print("Error: Cannot divide by zero")
             self.pointer = 100
             return None
         result = int(word1) // int(word2)
@@ -391,8 +391,8 @@ class ConsoleInputDisplay:
     def __init__(self, root, ml):
         self.root = root
         self.ml = ml
-        self.ml.gui_output = self.gui_output
-        self.ml.gui_input = self.gui_input
+        self.ml.print = self.gui_output
+        self.ml.input = self.gui_input
         self.console_frame = tk.Frame(self.root)
         self.console_label = tk.Label(self.console_frame, text="Console")
         self.console_text = scrolledtext.ScrolledText(self.console_frame,
