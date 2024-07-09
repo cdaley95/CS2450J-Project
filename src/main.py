@@ -19,6 +19,21 @@ class BasicML:
         self.pointer = 0
         self.input = input
         self.print = print
+        self.update_callback = None
+
+    def set_update_callback(self, callback):
+        '''sets callback function'''
+        self.update_callback = callback
+
+    def notify_update(self):
+        '''callback if set'''
+        if self.update_callback:
+            self.update_callback()
+
+    def loaddata(self, addr, data):
+        '''loads data into memory'''
+        self.memory[addr] = data
+        self.notify_update()
 
     def exec_instruction(self, instruction_code):
         '''Parses the code into the instruction and the memory location. 
@@ -51,6 +66,7 @@ class BasicML:
             case "43":
                 self.halt()
         self.pointer+=1
+        self.notify_update()
 
     def read(self, address):
         'Reads a word from the terminal and stores it in memory'
@@ -165,6 +181,93 @@ class BasicML:
             return word[0]+word[-4:]
         return word
 
+    def run_program(self):
+        '''runs program'''
+        while self.pointer < 100:
+            self.exec_instruction(self.memory[self.pointer])
+
+class BasicMLExec:
+    '''layer for executing BasicML program'''
+    def __init__(self, ml, poiaccu):
+        self.ml = ml
+        self.poiaccu = poiaccu
+
+    def step_program(self):
+        '''steps program'''
+        if self.ml.pointer < 100:
+            self.ml.exec_instruction(self.ml.memory[self.ml.pointer])
+
+    def run_program(self):
+        '''runs program form current pointer'''
+        self.ml.run_program()
+
+    def run_fromstart(self):
+        '''runs program from start'''
+        self.cleardata(0, 1, 1)
+        self.ml.run_program()
+
+    def cleardata(self, mem, poi, acc):
+        '''clears data'''
+        if mem:
+            mem = ["+0000"]*100
+        if acc:
+            acc = "+0000"
+        if poi:
+            poi = "0"
+        self.updatedata(mem, poi, acc)
+
+    def updatedata(self, mem, poi, acc):
+        '''updates data'''
+        if mem:
+            self.ml.memory = mem
+        if poi:
+            self.ml.pointer = int(poi)
+        if acc:
+            self.ml.accumulator = acc
+        self.ml.notify_update()
+
+
+class FileManager:
+    '''manages loading and saving files'''
+    def __init__(self, ml, execu):
+        self.ml = ml
+        self.exec = execu
+
+    def load_file(self):
+        '''load file contents to memory'''
+        filename = filedialog.askopenfilename()
+        if filename == '':
+            return
+        self.exec.cleardata(1, 1, 1)
+        if filename:
+            with open(filename,'r', encoding='utf-8') as file:
+                  # Reading lines
+                lines = file.readlines()
+                # Adding lines to memory
+                for line_index, line in enumerate(lines):
+                    stripped_line = line.rstrip('\n')
+                    if len(stripped_line) != 5:
+                        return "error2"
+                    if stripped_line[0] not in ['+','-']:
+                        return "error2"
+                    if not stripped_line[1:].isdigit():
+                        return "error2"
+                    self.ml.loaddata(line_index, stripped_line)
+                self.exec.cleardata(None, 1, 1)
+        else:
+            return "error1"
+
+    def save_file(self):
+        '''save file to directory'''
+        filename = filedialog.asksaveasfilename(filetypes=(("Text files", "*.txt"), ),
+                            defaultextension=".txt")
+        if filename == '':
+            return
+        filename = filename if ".txt" in filename else filename + ".txt"
+        with open(filename, 'w', encoding="utf-8") as output:
+            for row in self.ml.memory:
+                output.write(str(row)+"\n")
+
 class MemoryDisplay:
     '''Memory frame class'''
     def __init__(self, root, ml):
@@ -183,8 +286,7 @@ class MemoryDisplay:
         self.memory_list.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.memory_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.memory_list.config(yscrollcommand=self.memory_scrollbar.set)
-        for i in range(100):
-            self.memory_list.insert(tk.END, f"{i:02}: {self.ml.memory[i]}")
+        self.update_memory()
 
     def update_memory(self):
         '''updates memory in memory display'''
@@ -197,17 +299,19 @@ class PointAccumDisplay:
     def __init__(self, root, ml):
         self.root = root
         self.ml = ml
+        self.exec = BasicMLExec(ml, self)
 
         self.control_frame = tk.Frame(self.root)
 
         self.pointer_label = tk.Label(self.control_frame, text="Pointer")
         self.pointer_entry = tk.Entry(self.control_frame, width=3)
+        self.update_pointer_button = tk.Button(self.control_frame, text="Update Pointer",
+                                                command=self.update_pointer_entry)
 
         self.accumulator_label = tk.Label(self.control_frame, text="Accumulator")
         self.accumulator_entry = tk.Entry(self.control_frame, width=6)
-
-        self.update_button = tk.Button(self.control_frame,
-                    text="Update", command=self.update_both_entry)
+        self.update_accumulator_button = tk.Button(self.control_frame,
+                    text="Update Accumulator", command=self.update_accumulator_entry)
         self.reset_button = tk.Button(self.control_frame,
                     text="Reset",
                         command=self.reset_both)
@@ -220,40 +324,34 @@ class PointAccumDisplay:
         self.pointer_entry.pack(side=tk.LEFT, padx=5)
         self.pointer_entry.insert(0, f"{self.ml.pointer:02}")
         self.pointer_entry.bind("<Return>", self.update_pointer_entry)
+        self.update_pointer_button.pack(side=tk.LEFT, padx=5)
 
         self.accumulator_label.pack(side=tk.LEFT, padx=5)
         self.accumulator_entry.pack(side=tk.LEFT, padx=5)
         self.accumulator_entry.insert(0, f"{self.ml.accumulator}")
         self.accumulator_entry.bind("<Return>", self.update_accumulator_entry)
+        self.update_accumulator_button.pack(side=tk.LEFT, padx=5)
 
-        self.update_button.pack(side=tk.LEFT, padx=5)
         self.reset_button.pack(side=tk.LEFT, padx=5)
 
     def reset_pointer(self):
         '''reset pointer to initial value'''
-        self.ml.pointer = 0
-        self.pointer_entry.delete(0, tk.END)
-        self.pointer_entry.insert(0, f"{self.ml.pointer:02}")
+        self.exec.cleardata(0, 1, 0)
 
     def reset_accumulator(self):
         '''reset accumulator to initial value'''
-        self.ml.accumulator = "+0000"
-        self.accumulator_entry.delete(0, tk.END)
-        self.accumulator_entry.insert(0, f"{self.ml.accumulator}")
+        self.exec.cleardata(0, 0, 1)
 
     def reset_both(self):
         '''Reset pointer and accumulator to initial values'''
-        self.reset_pointer()
-        self.reset_accumulator()
+        self.exec.cleardata(0, 1, 1)
 
     def update_pointer_entry(self, _event=None):
         '''updates the pointer for user modification'''
         try:
             update_pointer = int(self.pointer_entry.get())
             if 0 <= update_pointer < 100:
-                self.ml.pointer = update_pointer
-                self.pointer_entry.delete(0, tk.END)
-                self.pointer_entry.insert(0, f"{self.ml.pointer:02}")
+                self.exec.updatedata(None, str(update_pointer), None)
             else:
                 self.reset_pointer()
         except ValueError:
@@ -270,21 +368,12 @@ class PointAccumDisplay:
                         update_accumulator = update_accumulator[0]+update_accumulator[1:].zfill(4)
                     else:
                         update_accumulator = "+"+update_accumulator.zfill(4)
-                self.ml.accumulator=update_accumulator
+                self.exec.updatedata(None, None, update_accumulator)
             else:
-                self.accumulator_entry.delete(0, tk.END)
-                self.accumulator_entry.insert(0, f"{self.ml.accumulator}")
+                self.reset_accumulator()
         except ValueError:
-            self.accumulator_entry.delete(0, tk.END)
-            self.accumulator_entry.insert(0, f"{self.ml.accumulator}")
-        self.accumulator_entry.delete(0, tk.END)
-        self.accumulator_entry.insert(0, f"{self.ml.accumulator}")
+            self.reset_accumulator()
         self.root.focus_set()
-
-    def update_both_entry(self):
-        '''update both accumulator and pointer'''
-        self.update_accumulator_entry()
-        self.update_pointer_entry()
 
 class Controls:
     '''Controls frame class'''
@@ -294,6 +383,8 @@ class Controls:
         self.memory = memory
         self.poiaccu = poiaccu
         self.outin = outin
+        self.exec = BasicMLExec(ml, poiaccu)
+        self.fileman = FileManager(ml, self.exec)
         self.buttons1_frame = tk.Frame(self.root)
 
         self.load_button = tk.Button(self.buttons1_frame, text="Load File", command=self.load_file)
@@ -323,76 +414,35 @@ class Controls:
 
     def load_file(self):
         '''method for loading file from button click'''
-        source_location = filedialog.askopenfilename()
-        if source_location == '':
-            return
-        self.ml.memory = ["+0000"]*100
-        self.memory.update_memory()
-        self.poiaccu.reset_both()
-        if source_location:
-            with open(source_location,'r', encoding='utf-8') as file:
-                  # Reading lines
-                lines = file.readlines()
-                # Adding lines to memory
-                for line_index, line in enumerate(lines):
-                    stripped_line = line.rstrip('\n')
-                    if len(stripped_line) != 5:
-                        self.outin.gui_output("File contents are not in correct format")
-                        self.memory.update_memory()
-                        return
-                    if stripped_line[0] not in ['+','-']:
-                        self.outin.gui_output("File contents are not in correct format")
-                        self.memory.update_memory()
-                        return
-                    if not stripped_line[1:].isdigit():
-                        self.outin.gui_output("File contents are not in correct format")
-                        self.memory.update_memory()
-                        return
-                    self.ml.memory[line_index] = stripped_line
-                self.memory.update_memory()
-                self.poiaccu.reset_both()
-        else:
+        info = self.fileman.load_file()
+        if info == "error1":
             self.outin.gui_output("File does not exist.")
             return
+        if info == "error2":
+            self.outin.gui_output("File contents are not in correct format")
+            return
+        return
 
     def save_file(self):
         '''saves a file from memory location'''
-        filename = filedialog.asksaveasfilename(filetypes=(("Text files", "*.txt"), ),
-                            defaultextension=".txt")
-        if filename == '':
-            return
-        filename = filename if ".txt" in filename else filename + ".txt"
-        with open(filename, 'w', encoding="utf-8") as output:
-            for row in self.ml.memory:
-                output.write(str(row)+"\n")
+        self.fileman.save_file()
 
     def run_fromstart(self):
         '''runs program from start'''
-        self.poiaccu.reset_both()
-        self.run_program()
+        self.exec.run_fromstart()
 
     def run_program(self):
-        '''runs program form current pointer location by iterating step program'''
-        while int(self.ml.pointer) <= 99:
-            self.step_program()
+        '''runs program form current pointer'''
+        self.exec.run_program()
 
     def step_program(self):
         '''steps the program with one instruction'''
-        if self.ml.pointer < 100:
-            self.ml.exec_instruction(self.ml.memory[self.ml.pointer])
-            self.memory.update_memory()
-            self.poiaccu.pointer_entry.delete(0, tk.END)
-            self.poiaccu.pointer_entry.insert(0, f"{self.ml.pointer:02}")
-            self.poiaccu.accumulator_entry.delete(0, tk.END)
-            self.poiaccu.accumulator_entry.insert(0, f"{self.ml.accumulator}")
+        self.exec.step_program()
 
 class ConsoleInputDisplay:
     '''Console and input class'''
-    def __init__(self, root, ml):
+    def __init__(self, root):
         self.root = root
-        self.ml = ml
-        self.ml.print = self.gui_output
-        self.ml.input = self.gui_input
         self.console_frame = tk.Frame(self.root)
         self.console_label = tk.Label(self.console_frame, text="Console")
         self.console_text = scrolledtext.ScrolledText(self.console_frame,
@@ -472,13 +522,24 @@ class ConsoleInputDisplay:
 
 class BasicMLGUI:
     '''Main GUI class'''
-    def __init__(self, ml):
+    def __init__(self):
         self.root = tk.Tk()
-        self.ml = ml
+        self.ml = BasicML()
         self.memory = MemoryDisplay(self.root, self.ml)
         self.poiaccu = PointAccumDisplay(self.root, self.ml)
-        self.outin = ConsoleInputDisplay(self.root, self.ml)
+        self.outin = ConsoleInputDisplay(self.root)
         self.controls = Controls(self.root, self.ml, self.memory, self.poiaccu, self.outin)
+        self.ml.print = self.outin.gui_output
+        self.ml.input = self.outin.gui_input
+        self.ml.set_update_callback(self.update_display)
+
+    def update_display(self):
+        '''updates the display whenever there's a change in BasicML'''
+        self.memory.update_memory()
+        self.poiaccu.pointer_entry.delete(0, tk.END)
+        self.poiaccu.pointer_entry.insert(0, f"{self.ml.pointer:02}")
+        self.poiaccu.accumulator_entry.delete(0, tk.END)
+        self.poiaccu.accumulator_entry.insert(0, f"{self.ml.accumulator}")
 
     def start(self):
         '''sets up GUI window and runs mainloop'''
@@ -491,12 +552,6 @@ class BasicMLGUI:
         self.outin.launch()
         self.root.mainloop()
 
-
-def main():
-    '''main function to run the mainloop'''
-    ml_instance = BasicML()
-    gui = BasicMLGUI(ml_instance)
-    gui.start()
-
 if __name__ == "__main__":
-    main()
+    gui = BasicMLGUI()
+    gui.start()
