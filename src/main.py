@@ -270,29 +270,118 @@ class FileManager:
 
 class MemoryDisplay:
     '''Memory frame class'''
+
     def __init__(self, root, ml):
+        '''Initializes memory frame'''
         self.root = root
         self.ml = ml
 
         self.memory_frame = tk.Frame(self.root)
-        self.memory_label = tk.Label(self.memory_frame, text="Program Memory")
-        self.memory_list = tk.Listbox(self.memory_frame, width=10)
-        self.memory_scrollbar = tk.Scrollbar(self.memory_frame, command=self.memory_list.yview)
+        self.memory_label = tk.Label(self.memory_frame,
+                                     text="Program Memory")
+        self.save_memory_button = tk.Button(self.memory_frame,
+                                            text="Save Memory",
+                                            command=self.save)
+        self.line_numbers = tk.Text(self.memory_frame,
+                                    width=4,
+                                    state="disabled")
+        self.memory_text = tk.Text(self.memory_frame,
+                                   width=10)
+        self.memory_scrollbar = tk.Scrollbar(self.memory_frame,
+                                             command=self.memory_text.yview)
 
     def launch(self):
-        '''initializes memory frame'''
-        self.memory_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5)
-        self.memory_label.pack(side=tk.TOP, pady=5)
-        self.memory_list.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        self.memory_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        self.memory_list.config(yscrollcommand=self.memory_scrollbar.set)
-        self.update_memory()
+        '''Finishes initializing memory frame'''
+        self.memory_frame.pack(side=tk.LEFT,
+                               fill=tk.BOTH,
+                               expand=True,
+                               padx=5)
+        self.memory_label.pack(side=tk.TOP,
+                               pady=5)
+        self.save_memory_button.pack(side=tk.BOTTOM,
+                                     pady=5)
+        self.line_numbers.pack(side=tk.LEFT,
+                               fill=tk.Y)
+        self.memory_text.pack(side=tk.LEFT,
+                              fill=tk.BOTH,
+                              expand=True)
+        self.memory_scrollbar.pack(side=tk.RIGHT,
+                                   fill=tk.Y)
 
-    def update_memory(self):
-        '''updates memory in memory display'''
-        self.memory_list.delete(0, tk.END)
+        # Ties both text widgets to the scrollbar
+        self.line_numbers.config(yscrollcommand=self.memory_scrollbar.set)
+        self.memory_text.config(yscrollcommand=self.memory_scrollbar.set)
+
+        # Checks for new lines on each keypress and updates line numbers
+        self.memory_text.bind("<KeyRelease>", self.update_line_numbers)
+
+        self.load()
+        self.sync_scroll()
+
+    def load(self):
+        '''Loads memory into memory frame'''
+        self.memory_text.delete("1.0", tk.END)
+
         for i in range(100):
-            self.memory_list.insert(tk.END, f"{i:02}: {self.ml.memory[i]}")
+            if i < 99:
+                self.memory_text.insert(tk.END, f"{self.ml.memory[i]}\n")
+            else:
+                self.memory_text.insert(tk.END, f"{self.ml.memory[i]}")
+
+        self.update_line_numbers()
+
+    def save(self):
+        '''Saves memory from memory frame'''
+        content = self.memory_text.get("1.0", "end-1c")
+        lines = content.splitlines()
+
+        if len(lines) > 100:
+            return self.ml.print("Error: Memory cannot exceed 100 entries.")
+
+        for index, line in enumerate(lines):
+            if line[0] not in ["+", "-"]:
+                return self.ml.print(f"Error: Word in register #{index:02} "
+                                     "must be signed.")
+            elif not line[1:].isdigit():
+                return self.ml.print(f"Error: Word in register #{index:02} "
+                                     "must be a number.")
+            elif len(line) != 5:
+                return self.ml.print(f"Error: Word in register #{index:02} "
+                                     "must be 5 characters.")
+
+        for index, line in enumerate(lines):
+            self.ml.memory[index] = line
+
+        # Fill remaining memory with 0s preventing issues when loading a small program after having loaded a larger one
+        for i in range(len(lines), 100):
+            self.ml.memory[i] = "+0000"
+
+        self.ml.print("Memory saved successfully.")
+
+    def scroll_position(self):
+        '''Gets scroll position'''
+        return self.memory_scrollbar.get()[0]
+
+    def update_line_numbers(self, event=None):
+        '''Updates line numbers'''
+        self.line_numbers.config(state="normal")
+        self.line_numbers.delete("1.0", tk.END)
+
+        line_count = int(self.memory_text.index("end-1c").split(".")[0])
+        content = "\n".join(f"{i:02}:" for i in range(line_count))
+
+        self.line_numbers.insert("1.0", content)
+        self.line_numbers.config(state="disabled")
+
+        self.line_numbers.yview_moveto(self.scroll_position())
+
+    def sync_scroll(self):
+        '''Syncs scroll'''
+        self.line_numbers.yview_moveto(self.scroll_position())
+        self.memory_text.yview_moveto(self.scroll_position())
+
+        # Calls itself every 25ms
+        self.memory_scrollbar.after(25, self.sync_scroll)
 
 class PointAccumDisplay:
     '''Pointer and Accumulator frame class'''
@@ -535,7 +624,7 @@ class BasicMLGUI:
 
     def update_display(self):
         '''updates the display whenever there's a change in BasicML'''
-        self.memory.update_memory()
+        self.memory.load()
         self.poiaccu.pointer_entry.delete(0, tk.END)
         self.poiaccu.pointer_entry.insert(0, f"{self.ml.pointer:02}")
         self.poiaccu.accumulator_entry.delete(0, tk.END)
