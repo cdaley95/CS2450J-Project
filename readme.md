@@ -35,13 +35,14 @@ BasicML is a simple virtual machine that simulates a basic machine language usin
 - Clicking the `Update pointer` button will update the accumulator and the pointer with the values in the pointer and accumulator. Pressing enter in the accumulator and pointer fields does the same thing.
 - Clicking the `Update Accumulator` button will update the accumulator and the pointer with the values in the pointer and accumulator. Pressing enter in the accumulator and pointer fields does the same thing.
 - Clicking the `Reset` button will clear the console and reset the pointer and accumulator.
+- Clicking the `Save File` button will allow you to save the current contents of the memory to a file you specify.
 - Clicking the `Continue Program from Pointer` will continue the program from the current pointer value until halted.
 - Clicking the `Step Program` button will run one instruction per click.
 - Clicking `Clear Console` will clear the content stored in the console.
 
 ## Usage
 
-- Insert any files with 5 character length words per line into the "files" folder.
+- Load any file from the file dialogue that has 5 character length words per line.
 - Program will provide an error if the file is not in the correct format.
 - You may choose to modify the color scheme by editing the values in `theme.py`. A restart is required to apply these changes.
 
