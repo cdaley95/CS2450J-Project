@@ -201,3 +201,4 @@ def test_divide_zero(one, two,):
     with pytest.raises(ZeroDivisionError):
         ml = BasicML()
         ml.accumulator = ml.wrap_around(ml.divide_words(one, two))
+
