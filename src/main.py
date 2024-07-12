@@ -351,15 +351,15 @@ class MemoryDisplay:
             return self.ml.print("Error: Memory cannot exceed 100 entries.")
 
         for index, line in enumerate(lines):
-            if line[0] not in ["+", "-"]:
+            if len(line) != 5:
+                return self.ml.print(f"Error: Word in register #{index:02} "
+                                     "must be 5 characters.")
+            elif line[0] not in ["+", "-"]:
                 return self.ml.print(f"Error: Word in register #{index:02} "
                                      "must be signed.")
             elif not line[1:].isdigit():
                 return self.ml.print(f"Error: Word in register #{index:02} "
                                      "must be a number.")
-            elif len(line) != 5:
-                return self.ml.print(f"Error: Word in register #{index:02} "
-                                     "must be 5 characters.")
 
         for index, line in enumerate(lines):
             self.ml.memory[index] = line
