@@ -29,7 +29,6 @@ BasicML is a simple virtual machine that simulates a basic machine language usin
 
 Open a terminal and navigate to the directory containing `main.py` in the `src` folder for the project and execute `main.py`.
 
-
 ## GUI file execution tutorial:
 
 ![Annotated application screenshot](product_preview_annotated.png)
@@ -50,7 +49,7 @@ Open a terminal and navigate to the directory containing `main.py` in the `src` 
 
 - Load any file from the file dialogue that has 5 character length words per line.
 - Program will provide an error if the file is not in the correct format.
-- You may choose to modify the color scheme by editing the values in `theme.py`. A restart is required to apply these changes.
+- You may choose to modify the color scheme by editing the values in `theme.py` within the `src` folder. A restart is required to apply these changes.
 
 ## What the program does/can do
 
@@ -58,7 +57,6 @@ Open a terminal and navigate to the directory containing `main.py` in the `src` 
 - Adds a value from another memory address to the accumulator.
 - Stores the result in a different memory address.
 - Prints the memory and accumulator values after execution.
-
 
 
 ## Arithmetic Operations
