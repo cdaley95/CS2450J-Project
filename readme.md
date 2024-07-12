@@ -25,10 +25,25 @@ BasicML is a simple virtual machine that simulates a basic machine language usin
 2. Ensure that tkinter is installed before executing.
 3. Clone the repository to your local machine.
 
+## GUI file execution tutorial:
+![Annotated application screenshot](product_preview_annotated.png)
+- After running the file by executing `main.py` and ensuring that tkinter is installed on your machine, click the `Load File` button in the upper left hand corner.
+- Select file to execute.
+- Click the `Run Program from Start` file. The application will then follow the instructions in the instruction file and display its contents to the console.
+- The `Program Memory` is editable and requires signed 4 digit numbers. An error will display in the console if an invalid input is inserted and attempted to save into memory.
+- Clicking on the `Save Memory` button will save the contents of the memory display into program memory.
+- Clicking the `Update pointer` button will update the accumulator and the pointer with the values in the pointer and accumulator. Pressing enter in the accumulator and pointer fields does the same thing.
+- Clicking the `Update Accumulator` button will update the accumulator and the pointer with the values in the pointer and accumulator. Pressing enter in the accumulator and pointer fields does the same thing.
+- Clicking the `Reset` button will clear the console and reset the pointer and accumulator.
+- Clicking the `Continue Program from Pointer` will continue the program from the current pointer value until halted.
+- Clicking the `Step Program` button will run one instruction per click.
+- Clicking `Clear Console` will clear the content stored in the console.
+
 ## Usage
 
 - Insert any files with 5 character length words per line into the "files" folder.
 - Program will provide an error if the file is not in the correct format.
+- You may choose to modify the color scheme by editing the values in `theme.py`. A restart is required to apply these changes.
 
 ## Running the Program
 
@@ -73,13 +88,3 @@ When results exceed four digits, BasicML handles the overflow by truncating and 
 - **BRANCHNEG = 41** Branch to a specific location in memory if the accumulator is negative.
 - **BRANCHZERO = 42** Branch to a specific location in memory if the accumulator is zero.
 - **HALT = 43** Stop the program
-
-## GUI file execution tutorial:
-![Annotated application screenshot](product_preview_annotated.png)
-- After running the file by executing `main.py` and ensuring that tkinter is installed on your machine, click the `Load File` button in the upper left hand corner.
-- Select file to execute.
-- Click the `Run Program` file. The application will then follow the instructions in the instruction file and display its contents to the console.
-- Clicking the `Update` button will update the accumulator and the pointer with the values in the pointer and accumulator. Pressing enter in the accumulator and pointer fields does the same thing.
-- Clicking the `Step Program` button will run one instruction per click.
-- Clicking the `Reset` button will clear the console and reset the pointer and accumulator.
-- Clicking `Clear Console` will clear the content stored in the console.
