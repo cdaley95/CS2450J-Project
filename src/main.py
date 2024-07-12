@@ -283,16 +283,18 @@ class FileManager:
 class MemoryDisplay:
     '''Memory frame class'''
 
-    def __init__(self, root, ml):
+    def __init__(self, mainwindow):
         '''Initializes memory frame'''
-        self.root = root
-        self.ml = ml
+        self.mainwindow = mainwindow
+        self.root = self.mainwindow.root
+        self.ml = self.mainwindow.ml
 
         self.memory_frame = tk.Frame(self.root, background=background)
         self.memory_label = tk.Label(self.memory_frame, background=background,
                                      text="Program Memory", fg=text)
         self.save_memory_button = tk.Button(self.memory_frame,
-                                            text="Save Memory", background=foreground, activebackground=active_foreground,
+                                            text="Save Memory", background=foreground,
+                                            activebackground=active_foreground,
                                             command=self.save, fg=text)
         self.line_numbers = tk.Text(self.memory_frame,
                                     width=4,
@@ -300,7 +302,9 @@ class MemoryDisplay:
         self.memory_text = tk.Text(self.memory_frame,
                                    width=10)
         self.memory_scrollbar = tk.Scrollbar(self.memory_frame,
-                                             command=self.memory_text.yview, background=scroll_bar, troughcolor=scroll_bar_background, activebackground=active_foreground)
+                                             command=self.memory_text.yview, background=scroll_bar,
+                                             troughcolor=scroll_bar_background,
+                                             activebackground=active_foreground)
 
     def launch(self):
         '''Finishes initializing memory frame'''
@@ -364,9 +368,11 @@ class MemoryDisplay:
         for index, line in enumerate(lines):
             self.ml.memory[index] = line
 
-        # Fill remaining memory with 0s preventing issues when loading a small program after having loaded a larger one
+        # Fill remaining memory with 0s preventing issues when loading
+        # a small program after having loaded a larger one
         for i in range(len(lines), 100):
             self.ml.memory[i] = "+0000"
+        self.mainwindow.update_display()
 
         self.ml.print("Memory saved successfully.")
 
@@ -374,12 +380,12 @@ class MemoryDisplay:
         '''Gets scroll position'''
         return self.memory_scrollbar.get()[0]
 
-    def update_line_numbers(self, event=None):
+    def update_line_numbers(self, _event=None):
         '''Updates line numbers'''
         self.line_numbers.config(state="normal")
         self.line_numbers.delete("1.0", tk.END)
 
-        line_count = int(self.memory_text.index("end-1c").split(".")[0])
+        line_count = int(self.memory_text.index('end-1c').split('.', maxsplit=1)[0])
         content = "\n".join(f"{i:02}:" for i in range(line_count))
 
         self.line_numbers.insert("1.0", content)
@@ -397,25 +403,32 @@ class MemoryDisplay:
 
 class PointAccumDisplay:
     '''Pointer and Accumulator frame class'''
-    def __init__(self, root, ml):
-        self.root = root
-        self.ml = ml
-        self.exec = BasicMLExec(ml, self)
+    def __init__(self, mainwindow):
+        self.mainwindow = mainwindow
+        self.root = self.mainwindow.root
+        self.ml = self.mainwindow.ml
+        self.exec = BasicMLExec(self.mainwindow.ml, self)
 
         self.control_frame = tk.Frame(self.root, background=background)
 
-        self.pointer_label = tk.Label(self.control_frame, fg=text, text="Pointer", background=background)
+        self.pointer_label = tk.Label(self.control_frame, fg=text,
+                                      text="Pointer", background=background)
         self.pointer_entry = tk.Entry(self.control_frame, width=3, background=text_background)
         self.update_pointer_button = tk.Button(self.control_frame, fg=text, text="Update Pointer",
-                                                command=self.update_pointer_entry, background=foreground, activebackground=active_foreground)
+                                                command=self.update_pointer_entry,
+                                                background=foreground,
+                                                activebackground=active_foreground)
 
-        self.accumulator_label = tk.Label(self.control_frame, fg=text, text="Accumulator", background=background)
+        self.accumulator_label = tk.Label(self.control_frame, fg=text,
+                                          text="Accumulator", background=background)
         self.accumulator_entry = tk.Entry(self.control_frame, width=6, background=text_background)
         self.update_accumulator_button = tk.Button(self.control_frame,
-                    fg=text, text="Update Accumulator", command=self.update_accumulator_entry, background=foreground, activebackground=active_foreground)
+                    fg=text, text="Update Accumulator", command=self.update_accumulator_entry,
+                    background=foreground, activebackground=active_foreground)
         self.reset_button = tk.Button(self.control_frame,
                     fg=text, text="Reset",
-                        command=self.reset_both, background=foreground, activebackground=active_foreground)
+                        command=self.reset_both, background=foreground,
+                        activebackground=active_foreground)
 
     def launch(self):
         '''initializes control frame'''
@@ -478,27 +491,35 @@ class PointAccumDisplay:
 
 class Controls:
     '''Controls frame class'''
-    def __init__(self, root, ml, memory, poiaccu, outin):
-        self.root = root
-        self.ml = ml
-        self.memory = memory
-        self.poiaccu = poiaccu
-        self.outin = outin
-        self.exec = BasicMLExec(ml, poiaccu)
-        self.fileman = FileManager(ml, self.exec)
+    def __init__(self, mainwindow):
+        self.mainwindow = mainwindow
+        self.root = self.mainwindow.root
+        self.ml = self.mainwindow.ml
+        self.memory = self.mainwindow.memory
+        self.poiaccu = self.mainwindow.poiaccu
+        self.outin = self.mainwindow.outin
+        self.exec = BasicMLExec(self.ml, self.poiaccu)
+        self.fileman = FileManager(self.ml, self.exec)
         self.buttons1_frame = tk.Frame(self.root, background=background)
 
-        self.load_button = tk.Button(self.buttons1_frame, fg=text, text="Load File", command=self.load_file, background=foreground, activebackground=active_foreground)
-        self.save_button = tk.Button(self.buttons1_frame, fg=text, text="Save File", command=self.save_file, background=foreground, activebackground=active_foreground)
+        self.load_button = tk.Button(self.buttons1_frame, fg=text, text="Load File",
+                                     command=self.load_file, background=foreground,
+                                     activebackground=active_foreground)
+        self.save_button = tk.Button(self.buttons1_frame, fg=text, text="Save File",
+                                     command=self.save_file, background=foreground,
+                                     activebackground=active_foreground)
 
         self.buttons2_frame = tk.Frame(self.root, background=background)
 
         self.run_button = tk.Button(self.buttons2_frame,
-                    fg=text, text="Run Program from Start", command=self.run_fromstart, background=foreground, activebackground=active_foreground)
+                    fg=text, text="Run Program from Start", command=self.run_fromstart,
+                    background=foreground, activebackground=active_foreground)
         self.continue_button = tk.Button(self.buttons2_frame,
-                    fg=text, text="Continue Program from Pointer", command=self.run_program, background=foreground, activebackground=active_foreground)
+                    fg=text, text="Continue Program from Pointer", command=self.run_program,
+                    background=foreground, activebackground=active_foreground)
         self.step_button = tk.Button(self.buttons2_frame,
-                    fg=text, text="Step Program", command=self.step_program, background=foreground, activebackground=active_foreground)
+                    fg=text, text="Step Program", command=self.step_program,
+                    background=foreground, activebackground=active_foreground)
 
     def launch(self):
         '''initializes button frame'''
@@ -542,26 +563,33 @@ class Controls:
 
 class ConsoleInputDisplay:
     '''Console and input class'''
-    def __init__(self, root):
-        self.root = root
+    def __init__(self, mainwindow):
+        self.mainwindow = mainwindow
+        self.root = self.mainwindow.root
         self.console_frame = tk.Frame(self.root, background=background)
-        self.console_label = tk.Label(self.console_frame, fg=text, text="Console", background=background)
+        self.console_label = tk.Label(self.console_frame, fg=text,
+                                       text="Console", background=background)
         self.console_text = scrolledtext.ScrolledText(self.console_frame,
                                 height=10, state=tk.DISABLED)
         ##
         self.console_text.configure(background=text_background)
-        self.console_text.vbar.configure(background=scroll_bar, troughcolor=scroll_bar_background, activebackground=active_foreground)
-        
+        self.console_text.vbar.configure(background=scroll_bar,
+                                          troughcolor=scroll_bar_background,
+                                          activebackground=active_foreground)
+
         ##
         self.console_clearbutton = tk.Button(self.console_frame,
-                            fg=text, text="Clear Console", command=self.clear_console, background=foreground, activebackground=active_foreground)
+                            fg=text, text="Clear Console", command=self.clear_console,
+                            background=foreground, activebackground=active_foreground)
         self.input_frame = tk.Frame(self.root, background=background)
         self.input_label = tk.Label(self.input_frame, fg=text, text="Input", background=background)
         self.input_entry_var = tk.StringVar()
         self.input_entry = tk.Entry(self.input_frame,
-                                     textvariable=self.input_entry_var, state=tk.DISABLED, background=text_background, disabledbackground=text_background)
+                                     textvariable=self.input_entry_var, state=tk.DISABLED,
+                                     background=text_background, disabledbackground=text_background)
         self.input_entry_button = tk.Button(self.input_frame,
-                            fg=text, text="Enter", command=self.handle_enter, background=foreground, activebackground=active_foreground)
+                            fg=text, text="Enter", command=self.handle_enter,
+                            background=foreground, activebackground=active_foreground)
         self.input_received = False
 
     def launch(self):
@@ -586,7 +614,8 @@ class ConsoleInputDisplay:
     def gui_input(self, prompt):
         '''input entry logic'''
         self.gui_output(prompt)
-        self.input_entry.config(state=tk.NORMAL, background=text_background, foreground=text_background)
+        self.input_entry.config(state=tk.NORMAL, background=text_background,
+                                foreground=text_background)
 
         self.input_entry_var.set("")
         self.input_entry.focus_set()
@@ -631,10 +660,10 @@ class BasicMLGUI:
     def __init__(self):
         self.root = tk.Tk()
         self.ml = BasicML()
-        self.memory = MemoryDisplay(self.root, self.ml)
-        self.poiaccu = PointAccumDisplay(self.root, self.ml)
-        self.outin = ConsoleInputDisplay(self.root)
-        self.controls = Controls(self.root, self.ml, self.memory, self.poiaccu, self.outin)
+        self.memory = MemoryDisplay(self)
+        self.poiaccu = PointAccumDisplay(self)
+        self.outin = ConsoleInputDisplay(self)
+        self.controls = Controls(self)
         self.ml.print = self.outin.gui_output
         self.ml.input = self.outin.gui_input
         self.ml.set_update_callback(self.update_display)
