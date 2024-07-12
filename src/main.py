@@ -296,9 +296,9 @@ class MemoryDisplay:
                                             command=self.save, fg=text)
         self.line_numbers = tk.Text(self.memory_frame,
                                     width=4,
-                                    state="disabled")
+                                    state="disabled", background=text_background)
         self.memory_text = tk.Text(self.memory_frame,
-                                   width=10)
+                                   width=10, background=text_background)
         self.memory_scrollbar = tk.Scrollbar(self.memory_frame,
                                              command=self.memory_text.yview, background=scroll_bar, troughcolor=scroll_bar_background, activebackground=active_foreground)
 
