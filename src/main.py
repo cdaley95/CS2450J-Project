@@ -6,6 +6,7 @@ Group: J
 '''
 from tkinter import scrolledtext, filedialog
 import tkinter as tk
+import os
 import time
 from theme import theme
 
@@ -650,8 +651,8 @@ class BasicMLGUI:
         '''sets up GUI window and runs mainloop'''
         self.root.title("UVSim Machine Language Interpreter")
         self.root.configure(background=background)
-        # self.root.iconbitmap(os.path.join(os.path.dirname(
-        #         os.path.dirname(os.path.abspath(__file__))), "files","images","icon.ico"))
+        self.root.iconbitmap(os.path.join(os.path.dirname(
+                os.path.dirname(os.path.abspath(__file__))), "files","images","icon.ico"))
         self.memory.launch()
         self.poiaccu.launch()
         self.controls.launch()
