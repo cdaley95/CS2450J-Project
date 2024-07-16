@@ -263,7 +263,8 @@ class FileManager:
                         return "error2"
                     if not stripped_line[1:].isdigit():
                         return "error2"
-                    self.ml.loaddata(line_index, stripped_line)
+                    self.ml.loaddata(line_index, 
+                                     ''.join((stripped_line[0:3]+"00"+stripped_line[3:])))
                 self.exec.cleardata(None, 1, 1)
         else:
             return "error1"
