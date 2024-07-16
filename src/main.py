@@ -50,31 +50,31 @@ class BasicML:
         '''Parses the code into the instruction and the memory location. 
         Also matches the instruction number to the method to execute.'''
         memory_loc = int(instruction_code[4:])
-        instruction = instruction_code[1:4]
+        instruction = instruction_code[1:3]
         match instruction:
-            case "010":
+            case "10":
                 self.read(memory_loc)
-            case "011":
+            case "11":
                 self.write(memory_loc)
-            case "020":
+            case "20":
                 self.load(memory_loc)
-            case "021":
+            case "21":
                 self.store(memory_loc)
-            case "030":
+            case "30":
                 self.add(memory_loc)
-            case "031":
+            case "31":
                 self.subtract(memory_loc)
-            case "032":
+            case "32":
                 self.divide(memory_loc)
-            case "033":
+            case "33":
                 self.multiply(memory_loc)
-            case "040":
+            case "40":
                 self.branch(memory_loc)
-            case "041":
+            case "41":
                 self.branchneg(memory_loc)
-            case "042":
+            case "42":
                 self.branchzero(memory_loc)
-            case "043":
+            case "43":
                 self.halt()
         self.pointer += 1
         self.notify_update()
@@ -165,31 +165,31 @@ class BasicML:
     def add_words(self, word1, word2):
         'Converts words to int, sums together, then returns string conversion'
         result = int(word1) + int(word2)
-        return f"{result:+05d}"
+        return f"{result:+07d}"
 
     def subtract_words(self, word1, word2):
         'Converts words to int, subtracts, then returns string conversion'
         result = int(word1) - int(word2)
-        return f"{result:+05d}"
+        return f"{result:+07d}"
 
     def divide_words(self, word1, word2):
         'Converts words to int, divides, then returns string conversion'
         if int(word2) == 0:
             self.print("Error: Cannot divide by zero")
-            self.pointer = 100
+            self.pointer = 250
             return None
         result = int(word1) // int(word2)
-        return f"{result:+05d}"
+        return f"{result:+07d}"
 
     def multiply_words(self, word1, word2):
         'Converts words to int, multiplies, then returns string conversion'
         result = int(word1) * int(word2)
-        return f"{result:+05d}"
+        return f"{result:+07d}"
 
     def wrap_around(self, word):
         'Converts words to int, multiplies, then returns string conversion'
-        if len(word) > 5:
-            return word[0]+word[-4:]
+        if len(word) > 7:
+            return word[0]+word[-6:]
         return word
 
     def run_program(self):
