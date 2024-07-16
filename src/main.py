@@ -11,16 +11,6 @@ import time
 from theme import theme
 
 
-background = theme["background"]
-foreground = theme["foreground"]
-active_foreground = theme["active_foreground"]
-text_background = theme["text_background"]
-text = theme["text"]
-scroll_bar = theme["scroll_bar"]
-scroll_bar_background = theme["scroll_bar_background"]
-
-
-
 class BasicML:
     '''Initialized with a 250 word memory and a single
     register named accumulator'''
@@ -263,7 +253,7 @@ class FileManager:
                         return "error2"
                     if not stripped_line[1:].isdigit():
                         return "error2"
-                    self.ml.loaddata(line_index, 
+                    self.ml.loaddata(line_index,
                                      ''.join((stripped_line[0:3]+"00"+stripped_line[3:])))
                 self.exec.cleardata(None, 1, 1)
         else:
@@ -289,22 +279,23 @@ class MemoryDisplay:
         self.root = self.mainwindow.root
         self.ml = self.mainwindow.ml
 
-        self.memory_frame = tk.Frame(self.root, background=background)
-        self.memory_label = tk.Label(self.memory_frame, background=background,
-                                     text="Program Memory", fg=text)
+        self.memory_frame = tk.Frame(self.root, background=theme["background"])
+        self.memory_label = tk.Label(self.memory_frame, background=theme["background"],
+                                     text="Program Memory", fg=theme["text"])
         self.save_memory_button = tk.Button(self.memory_frame,
-                                            text="Save Memory", background=foreground,
-                                            activebackground=active_foreground,
-                                            command=self.save, fg=text)
+                                            text="Save Memory", background=theme["foreground"],
+                                            activebackground=theme["active_foreground"],
+                                            command=self.save, fg=theme["text"])
         self.line_numbers = tk.Text(self.memory_frame,
                                     width=5,
-                                    state="disabled", background=text_background)
+                                    state="disabled", background=theme["text_background"])
         self.memory_text = tk.Text(self.memory_frame,
-                                   width=14, background=text_background)
+                                   width=14, background=theme["text_background"])
         self.memory_scrollbar = tk.Scrollbar(self.memory_frame,
-                                             command=self.memory_text.yview, background=scroll_bar,
-                                             troughcolor=scroll_bar_background,
-                                             activebackground=active_foreground)
+                                             command=self.memory_text.yview,
+                                             background=theme["scroll_bar"],
+                                             troughcolor=theme["scroll_bar_background"],
+                                             activebackground=theme["active_foreground"])
 
     def launch(self):
         '''Finishes initializing memory frame'''
@@ -409,26 +400,31 @@ class PointAccumDisplay:
         self.ml = self.mainwindow.ml
         self.exec = BasicMLExec(self.mainwindow.ml, self)
 
-        self.control_frame = tk.Frame(self.root, background=background)
+        self.control_frame = tk.Frame(self.root, background=theme["background"])
 
-        self.pointer_label = tk.Label(self.control_frame, fg=text,
-                                      text="Pointer", background=background)
-        self.pointer_entry = tk.Entry(self.control_frame, width=4, background=text_background)
-        self.update_pointer_button = tk.Button(self.control_frame, fg=text, text="Update Pointer",
+        self.pointer_label = tk.Label(self.control_frame, fg=theme["text"],
+                                      text="Pointer",
+                                      background=theme["background"])
+        self.pointer_entry = tk.Entry(self.control_frame, width=4,
+                                      background=theme["text_background"])
+        self.update_pointer_button = tk.Button(self.control_frame, fg=theme["text"],
+                                               text="Update Pointer",
                                                 command=self.update_pointer_entry,
-                                                background=foreground,
-                                                activebackground=active_foreground)
+                                                background=theme["foreground"],
+                                                activebackground=theme["active_foreground"])
 
-        self.accumulator_label = tk.Label(self.control_frame, fg=text,
-                                          text="Accumulator", background=background)
-        self.accumulator_entry = tk.Entry(self.control_frame, width=8, background=text_background)
+        self.accumulator_label = tk.Label(self.control_frame, fg=theme["text"],
+                                          text="Accumulator", background=theme["background"])
+        self.accumulator_entry = tk.Entry(self.control_frame, width=8,
+                                          background=theme["text_background"])
         self.update_accumulator_button = tk.Button(self.control_frame,
-                    fg=text, text="Update Accumulator", command=self.update_accumulator_entry,
-                    background=foreground, activebackground=active_foreground)
+                    fg=theme["text"], text="Update Accumulator",
+                    command=self.update_accumulator_entry,
+                    background=theme["foreground"], activebackground=theme["active_foreground"])
         self.reset_button = tk.Button(self.control_frame,
-                    fg=text, text="Reset",
-                        command=self.reset_both, background=foreground,
-                        activebackground=active_foreground)
+                    fg=theme["text"], text="Reset",
+                        command=self.reset_both, background=theme["foreground"],
+                        activebackground=theme["active_foreground"])
 
     def launch(self):
         '''initializes control frame'''
@@ -500,26 +496,27 @@ class Controls:
         self.outin = self.mainwindow.outin
         self.exec = BasicMLExec(self.ml, self.poiaccu)
         self.fileman = FileManager(self.ml, self.exec)
-        self.buttons1_frame = tk.Frame(self.root, background=background)
+        self.buttons1_frame = tk.Frame(self.root, background=theme["background"])
 
-        self.load_button = tk.Button(self.buttons1_frame, fg=text, text="Load File",
-                                     command=self.load_file, background=foreground,
-                                     activebackground=active_foreground)
-        self.save_button = tk.Button(self.buttons1_frame, fg=text, text="Save File",
-                                     command=self.save_file, background=foreground,
-                                     activebackground=active_foreground)
+        self.load_button = tk.Button(self.buttons1_frame, fg=theme["text"], text="Load File",
+                                     command=self.load_file, background=theme["foreground"],
+                                     activebackground=theme["active_foreground"])
+        self.save_button = tk.Button(self.buttons1_frame, fg=theme["text"], text="Save File",
+                                     command=self.save_file, background=theme["foreground"],
+                                     activebackground=theme["active_foreground"])
 
-        self.buttons2_frame = tk.Frame(self.root, background=background)
+        self.buttons2_frame = tk.Frame(self.root, background=theme["background"])
 
         self.run_button = tk.Button(self.buttons2_frame,
-                    fg=text, text="Run Program from Start", command=self.run_fromstart,
-                    background=foreground, activebackground=active_foreground)
+                    fg=theme["text"], text="Run Program from Start", command=self.run_fromstart,
+                    background=theme["foreground"], activebackground=theme["active_foreground"])
         self.continue_button = tk.Button(self.buttons2_frame,
-                    fg=text, text="Continue Program from Pointer", command=self.run_program,
-                    background=foreground, activebackground=active_foreground)
+                    fg=theme["text"], text="Continue Program from Pointer",
+                    command=self.run_program, background=theme["foreground"],
+                    activebackground=theme["active_foreground"])
         self.step_button = tk.Button(self.buttons2_frame,
-                    fg=text, text="Step Program", command=self.step_program,
-                    background=foreground, activebackground=active_foreground)
+                    fg=theme["text"], text="Step Program", command=self.step_program,
+                    background=theme["foreground"], activebackground=theme["active_foreground"])
 
     def launch(self):
         '''initializes button frame'''
@@ -566,30 +563,34 @@ class ConsoleInputDisplay:
     def __init__(self, mainwindow):
         self.mainwindow = mainwindow
         self.root = self.mainwindow.root
-        self.console_frame = tk.Frame(self.root, background=background)
-        self.console_label = tk.Label(self.console_frame, fg=text,
-                                       text="Console", background=background)
+        self.console_frame = tk.Frame(self.root, background=theme["background"])
+        self.console_label = tk.Label(self.console_frame, fg=theme["text"],
+                                       text="Console", background=theme["background"])
         self.console_text = scrolledtext.ScrolledText(self.console_frame,
                                 height=10, state=tk.DISABLED)
         ##
-        self.console_text.configure(background=text_background)
-        self.console_text.vbar.configure(background=scroll_bar,
-                                          troughcolor=scroll_bar_background,
-                                          activebackground=active_foreground)
+        self.console_text.configure(background=theme["text_background"])
+        self.console_text.vbar.configure(background=theme["scroll_bar"],
+                                          troughcolor=theme["scroll_bar_background"],
+                                          activebackground=theme["active_foreground"])
 
         ##
         self.console_clearbutton = tk.Button(self.console_frame,
-                            fg=text, text="Clear Console", command=self.clear_console,
-                            background=foreground, activebackground=active_foreground)
-        self.input_frame = tk.Frame(self.root, background=background)
-        self.input_label = tk.Label(self.input_frame, fg=text, text="Input", background=background)
+                            fg=theme["text"], text="Clear Console", command=self.clear_console,
+                            background=theme["foreground"],
+                            activebackground=theme["active_foreground"])
+        self.input_frame = tk.Frame(self.root, background=theme["background"])
+        self.input_label = tk.Label(self.input_frame, fg=theme["text"],
+                                    text="Input", background=theme["background"])
         self.input_entry_var = tk.StringVar()
         self.input_entry = tk.Entry(self.input_frame,
-                                     textvariable=self.input_entry_var, state=tk.DISABLED,
-                                     background=text_background, disabledbackground=text_background)
+                                     textvariable=self.input_entry_var,
+                                     state=tk.DISABLED,background=theme["text_background"],
+                                     disabledbackground=theme["text_background"])
         self.input_entry_button = tk.Button(self.input_frame,
-                            fg=text, text="Enter", command=self.handle_enter,
-                            background=foreground, activebackground=active_foreground)
+                            fg=theme["text"], text="Enter",
+                            command=self.handle_enter, background=theme["foreground"],
+                            activebackground=theme["active_foreground"])
         self.input_received = False
 
     def launch(self):
@@ -614,8 +615,8 @@ class ConsoleInputDisplay:
     def gui_input(self, prompt):
         '''input entry logic'''
         self.gui_output(prompt)
-        self.input_entry.config(state=tk.NORMAL, background=text_background,
-                                foreground=text_background)
+        self.input_entry.config(state=tk.NORMAL, background=theme["text_background"],
+                                foreground=theme["text_background"])
 
         self.input_entry_var.set("")
         self.input_entry.focus_set()
@@ -679,7 +680,7 @@ class BasicMLGUI:
     def start(self):
         '''sets up GUI window and runs mainloop'''
         self.root.title("UVSim Machine Language Interpreter")
-        self.root.configure(background=background)
+        self.root.configure(background=theme["background"])
         self.root.iconbitmap(os.path.join(os.path.dirname(
                 os.path.dirname(os.path.abspath(__file__))), "files","images","icon.ico"))
         self.memory.launch()
