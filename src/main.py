@@ -22,12 +22,11 @@ scroll_bar_background = theme["scroll_bar_background"]
 
 
 class BasicML:
-    '''Initialized with a 100 word memory and a single
-    register named accumulator, as well as a dictionary
-    for the opcodes'''
+    '''Initialized with a 250 word memory and a single
+    register named accumulator'''
     def __init__(self):
-        self.memory = ["+0000"]*100
-        self.accumulator = "+0000"
+        self.memory = ["+000000"]*250
+        self.accumulator = "+000000"
         self.pointer = 0
         self.input = input
         self.print = print
@@ -50,63 +49,63 @@ class BasicML:
     def exec_instruction(self, instruction_code):
         '''Parses the code into the instruction and the memory location. 
         Also matches the instruction number to the method to execute.'''
-        memory_loc = int(instruction_code[3:])
-        instruction = instruction_code[1:3]
+        memory_loc = int(instruction_code[4:])
+        instruction = instruction_code[1:4]
         match instruction:
-            case "10":
+            case "010":
                 self.read(memory_loc)
-            case "11":
+            case "011":
                 self.write(memory_loc)
-            case "20":
+            case "020":
                 self.load(memory_loc)
-            case "21":
+            case "021":
                 self.store(memory_loc)
-            case "30":
+            case "030":
                 self.add(memory_loc)
-            case "31":
+            case "031":
                 self.subtract(memory_loc)
-            case "32":
+            case "032":
                 self.divide(memory_loc)
-            case "33":
+            case "033":
                 self.multiply(memory_loc)
-            case "40":
+            case "040":
                 self.branch(memory_loc)
-            case "41":
+            case "041":
                 self.branchneg(memory_loc)
-            case "42":
+            case "042":
                 self.branchzero(memory_loc)
-            case "43":
+            case "043":
                 self.halt()
-        self.pointer+=1
+        self.pointer += 1
         self.notify_update()
 
     def read(self, address):
         'Reads a word from the terminal and stores it in memory'
         usrinput = self.input(f"Word into memory location {address}: ")
-        if len(usrinput) == 5:
+        if len(usrinput) == 7:
             if usrinput[0] not in ['+', '-']:
-                self.print("Error: 5 character input must be signed 4 digit number.")
+                self.print("Error: 7 character input must be signed 6 digit number.")
                 self.halt()
                 return
             if not usrinput[1:].isdigit():
                 self.print("Error: Input must be signed or unsigned word with digits.")
                 self.halt()
                 return
-        elif len(usrinput) <= 4:
+        elif len(usrinput) < 7:
             if usrinput[0] in ['+', '-']:
                 if not usrinput[1:].isdigit():
                     self.print("Error: Input must be signed or unsigned word with digits.")
                     self.halt()
                     return
-                usrinput = usrinput[0]+usrinput[1:].zfill(4)
+                usrinput = usrinput[0]+usrinput[1:].zfill(6)
             else:
                 if not usrinput.isdigit():
                     self.print("Error: Input must be signed or unsigned word with digits.")
                     self.halt()
                     return
-                usrinput = "+"+usrinput.zfill(4)
+                usrinput = "+"+usrinput.zfill(6)
         else:
-            self.print("Error: Input cannot have more than 5 characters.")
+            self.print("Error: Input cannot have more than 7 characters.")
             self.halt()
             return
         self.memory[address] = usrinput
@@ -160,7 +159,7 @@ class BasicML:
 
     def halt(self):
         'Stops the program'
-        self.pointer = 99
+        self.pointer = 249
         self.print(" - - Halted Program - - ")
 
     def add_words(self, word1, word2):
@@ -195,7 +194,7 @@ class BasicML:
 
     def run_program(self):
         '''runs program'''
-        while self.pointer < 100:
+        while self.pointer < 250:
             self.exec_instruction(self.memory[self.pointer])
 
 class BasicMLExec:
@@ -206,7 +205,7 @@ class BasicMLExec:
 
     def step_program(self):
         '''steps program'''
-        if self.ml.pointer < 100:
+        if self.ml.pointer < 250:
             self.ml.exec_instruction(self.ml.memory[self.ml.pointer])
 
     def run_program(self):
@@ -221,9 +220,9 @@ class BasicMLExec:
     def cleardata(self, mem, poi, acc):
         '''clears data'''
         if mem:
-            mem = ["+0000"]*100
+            mem = ["+000000"]*250
         if acc:
-            acc = "+0000"
+            acc = "+000000"
         if poi:
             poi = "0"
         self.updatedata(mem, poi, acc)
@@ -297,10 +296,10 @@ class MemoryDisplay:
                                             activebackground=active_foreground,
                                             command=self.save, fg=text)
         self.line_numbers = tk.Text(self.memory_frame,
-                                    width=4,
+                                    width=5,
                                     state="disabled", background=text_background)
         self.memory_text = tk.Text(self.memory_frame,
-                                   width=10, background=text_background)
+                                   width=14, background=text_background)
         self.memory_scrollbar = tk.Scrollbar(self.memory_frame,
                                              command=self.memory_text.yview, background=scroll_bar,
                                              troughcolor=scroll_bar_background,
@@ -338,8 +337,8 @@ class MemoryDisplay:
         '''Loads memory into memory frame'''
         self.memory_text.delete("1.0", tk.END)
 
-        for i in range(100):
-            if i < 99:
+        for i in range(250):
+            if i < 249:
                 self.memory_text.insert(tk.END, f"{self.ml.memory[i]}\n")
             else:
                 self.memory_text.insert(tk.END, f"{self.ml.memory[i]}")
@@ -351,18 +350,18 @@ class MemoryDisplay:
         content = self.memory_text.get("1.0", "end-1c")
         lines = content.splitlines()
 
-        if len(lines) > 100:
-            return self.ml.print("Error: Memory cannot exceed 100 entries.")
+        if len(lines) > 250:
+            return self.ml.print("Error: Memory cannot exceed 250 entries.")
 
         for index, line in enumerate(lines):
-            if len(line) != 5:
-                return self.ml.print(f"Error: Word in register #{index:02} "
-                                     "must be 5 characters.")
+            if len(line) != 7:
+                return self.ml.print(f"Error: Word in register #{index:03} "
+                                     "must be 7 characters.")
             elif line[0] not in ["+", "-"]:
-                return self.ml.print(f"Error: Word in register #{index:02} "
+                return self.ml.print(f"Error: Word in register #{index:03} "
                                      "must be signed.")
             elif not line[1:].isdigit():
-                return self.ml.print(f"Error: Word in register #{index:02} "
+                return self.ml.print(f"Error: Word in register #{index:03} "
                                      "must be a number.")
 
         for index, line in enumerate(lines):
@@ -370,8 +369,8 @@ class MemoryDisplay:
 
         # Fill remaining memory with 0s preventing issues when loading
         # a small program after having loaded a larger one
-        for i in range(len(lines), 100):
-            self.ml.memory[i] = "+0000"
+        for i in range(len(lines), 250):
+            self.ml.memory[i] = "+000000"
         self.mainwindow.update_display()
 
         self.ml.print("Memory saved successfully.")
@@ -386,7 +385,7 @@ class MemoryDisplay:
         self.line_numbers.delete("1.0", tk.END)
 
         line_count = int(self.memory_text.index('end-1c').split('.', maxsplit=1)[0])
-        content = "\n".join(f"{i:02}:" for i in range(line_count))
+        content = "\n".join(f"{i:03}:" for i in range(line_count))
 
         self.line_numbers.insert("1.0", content)
         self.line_numbers.config(state="disabled")
@@ -413,7 +412,7 @@ class PointAccumDisplay:
 
         self.pointer_label = tk.Label(self.control_frame, fg=text,
                                       text="Pointer", background=background)
-        self.pointer_entry = tk.Entry(self.control_frame, width=3, background=text_background)
+        self.pointer_entry = tk.Entry(self.control_frame, width=4, background=text_background)
         self.update_pointer_button = tk.Button(self.control_frame, fg=text, text="Update Pointer",
                                                 command=self.update_pointer_entry,
                                                 background=foreground,
@@ -421,7 +420,7 @@ class PointAccumDisplay:
 
         self.accumulator_label = tk.Label(self.control_frame, fg=text,
                                           text="Accumulator", background=background)
-        self.accumulator_entry = tk.Entry(self.control_frame, width=6, background=text_background)
+        self.accumulator_entry = tk.Entry(self.control_frame, width=8, background=text_background)
         self.update_accumulator_button = tk.Button(self.control_frame,
                     fg=text, text="Update Accumulator", command=self.update_accumulator_entry,
                     background=foreground, activebackground=active_foreground)
@@ -436,7 +435,7 @@ class PointAccumDisplay:
 
         self.pointer_label.pack(side=tk.LEFT, padx=5)
         self.pointer_entry.pack(side=tk.LEFT, padx=5)
-        self.pointer_entry.insert(0, f"{self.ml.pointer:02}")
+        self.pointer_entry.insert(0, f"{self.ml.pointer:03}")
         self.pointer_entry.bind("<Return>", self.update_pointer_entry)
         self.update_pointer_button.pack(side=tk.LEFT, padx=5)
 
@@ -464,7 +463,7 @@ class PointAccumDisplay:
         '''updates the pointer for user modification'''
         try:
             update_pointer = int(self.pointer_entry.get())
-            if 0 <= update_pointer < 100:
+            if 0 <= update_pointer < 250:
                 self.exec.updatedata(None, str(update_pointer), None)
             else:
                 self.reset_pointer()
@@ -476,12 +475,12 @@ class PointAccumDisplay:
         '''updates the accumulator for user modification'''
         try:
             update_accumulator = self.accumulator_entry.get()
-            if -9999<= int(update_accumulator) <= 9999:
-                if len(update_accumulator) < 5:
+            if -999999 <= int(update_accumulator) <= 999999:
+                if len(update_accumulator) < 7:
                     if update_accumulator[0] in ["-", "+"]:
-                        update_accumulator = update_accumulator[0]+update_accumulator[1:].zfill(4)
+                        update_accumulator = update_accumulator[0]+update_accumulator[1:].zfill(6)
                     else:
-                        update_accumulator = "+"+update_accumulator.zfill(4)
+                        update_accumulator = "+"+update_accumulator.zfill(6)
                 self.exec.updatedata(None, None, update_accumulator)
             else:
                 self.reset_accumulator()
@@ -628,11 +627,11 @@ class ConsoleInputDisplay:
 
         input_value = self.input_entry_var.get()
         if input_value == "":
-            input_value = "+0000"
-        elif input_value.isdigit() and len(input_value)<5:
-            input_value = "+"+input_value.zfill(4)
-        elif input_value[0] == "-" and len(input_value)<6:
-            input_value = "-"+input_value[1:].zfill(4)
+            input_value = "+000000"
+        elif input_value.isdigit() and len(input_value) < 7:
+            input_value = "+"+input_value.zfill(6)
+        elif input_value[0] == "-" and len(input_value) < 8:
+            input_value = "-"+input_value[1:].zfill(6)
         else:
             pass
         self.input_entry_var.set("")
@@ -672,7 +671,7 @@ class BasicMLGUI:
         '''updates the display whenever there's a change in BasicML'''
         self.memory.load()
         self.poiaccu.pointer_entry.delete(0, tk.END)
-        self.poiaccu.pointer_entry.insert(0, f"{self.ml.pointer:02}")
+        self.poiaccu.pointer_entry.insert(0, f"{self.ml.pointer:03}")
         self.poiaccu.accumulator_entry.delete(0, tk.END)
         self.poiaccu.accumulator_entry.insert(0, f"{self.ml.accumulator}")
 
