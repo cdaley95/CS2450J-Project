@@ -40,31 +40,31 @@ class BasicML:
         '''Parses the code into the instruction and the memory location. 
         Also matches the instruction number to the method to execute.'''
         memory_loc = int(instruction_code[4:])
-        instruction = instruction_code[1:3]
+        instruction = instruction_code[1:4]
         match instruction:
-            case "10":
+            case "010":
                 self.read(memory_loc)
-            case "11":
+            case "011":
                 self.write(memory_loc)
-            case "20":
+            case "020":
                 self.load(memory_loc)
-            case "21":
+            case "021":
                 self.store(memory_loc)
-            case "30":
+            case "030":
                 self.add(memory_loc)
-            case "31":
+            case "031":
                 self.subtract(memory_loc)
-            case "32":
+            case "032":
                 self.divide(memory_loc)
-            case "33":
+            case "033":
                 self.multiply(memory_loc)
-            case "40":
+            case "040":
                 self.branch(memory_loc)
-            case "41":
+            case "041":
                 self.branchneg(memory_loc)
-            case "42":
+            case "042":
                 self.branchzero(memory_loc)
-            case "43":
+            case "043":
                 self.halt()
         self.pointer += 1
         self.notify_update()
@@ -254,7 +254,8 @@ class FileManager:
                     if not stripped_line[1:].isdigit():
                         return "error2"
                     self.ml.loaddata(line_index,
-                                     ''.join((stripped_line[0:3]+"00"+stripped_line[3:])))
+                                     ''.join((stripped_line[0]+"0"+
+                                              stripped_line[1:3]+"0"+stripped_line[3:])))
                 self.exec.cleardata(None, 1, 1)
         else:
             return "error1"
