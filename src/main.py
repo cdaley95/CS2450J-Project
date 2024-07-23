@@ -244,6 +244,14 @@ class FileManager:
             with open(filename,'r', encoding='utf-8') as file:
                   # Reading lines
                 lines = file.readlines()
+                first_line_length = len(lines[0].strip())
+                
+                for i in range(1, len(lines)):
+                    current_line_length = len(lines[i].strip())
+                    if current_line_length != first_line_length:
+                        return "error3"
+        
+ 
                 # Adding lines to memory
                 for line_index, line in enumerate(lines):
                     stripped_line = line.rstrip('\n')
@@ -253,6 +261,7 @@ class FileManager:
                         return "error2"
                     if not stripped_line[1:].isdigit():
                         return "error2"
+                    
                     if len(stripped_line) == 5:
                         self.ml.loaddata(line_index,
                                      ''.join((stripped_line[0]+"0"+
@@ -543,6 +552,9 @@ class Controls:
             return
         if info == "error2":
             self.outin.gui_output("File contents are not in correct format")
+            return
+        if info == "error3":
+            self.outin.gui_output("Error files content need to be all 6 or all 4 digit")
             return
         return
 
