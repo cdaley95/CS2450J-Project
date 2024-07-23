@@ -233,6 +233,11 @@ class FileManager:
     def __init__(self, ml, execu):
         self.ml = ml
         self.exec = execu
+        self.opcodes = [
+            "10","11","20","21",
+            "30","31","32","33",
+            "40","41","42","43"
+        ]
 
     def load_file(self):
         '''load file contents to memory'''
@@ -242,16 +247,13 @@ class FileManager:
         self.exec.cleardata(1, 1, 1)
         if filename:
             with open(filename,'r', encoding='utf-8') as file:
-                  # Reading lines
+                # Reading lines
                 lines = file.readlines()
                 first_line_length = len(lines[0].strip())
-                
                 for i in range(1, len(lines)):
                     current_line_length = len(lines[i].strip())
                     if current_line_length != first_line_length:
                         return "error3"
-        
- 
                 # Adding lines to memory
                 for line_index, line in enumerate(lines):
                     stripped_line = line.rstrip('\n')
@@ -261,11 +263,15 @@ class FileManager:
                         return "error2"
                     if not stripped_line[1:].isdigit():
                         return "error2"
-                    
+
                     if len(stripped_line) == 5:
-                        self.ml.loaddata(line_index,
-                                     ''.join((stripped_line[0]+"0"+
-                                              stripped_line[1:3]+"0"+stripped_line[3:])))
+                        if stripped_line[1:3] in self.opcodes:
+                            self.ml.loaddata(line_index,
+                                        ''.join((stripped_line[0]+"0"+
+                                                stripped_line[1:3]+"0"+stripped_line[3:])))
+                        else:
+                            self.ml.loaddata(line_index,
+                                        ''.join((stripped_line[0]+"00"+stripped_line[1:])))
                     if len(stripped_line) == 7:
                         self.ml.loaddata(line_index, stripped_line)
                 self.exec.cleardata(None, 1, 1)
@@ -632,7 +638,7 @@ class ConsoleInputDisplay:
         '''input entry logic'''
         self.gui_output(prompt)
         self.input_entry.config(state=tk.NORMAL, background=theme["text_background"],
-                                foreground=theme["text_background"])
+                                foreground=theme["foreground"])
 
         self.input_entry_var.set("")
         self.input_entry.focus_set()
