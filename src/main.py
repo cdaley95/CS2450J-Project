@@ -247,15 +247,18 @@ class FileManager:
                 # Adding lines to memory
                 for line_index, line in enumerate(lines):
                     stripped_line = line.rstrip('\n')
-                    if len(stripped_line) != 5:
+                    if len(stripped_line) != 5 and len(stripped_line) != 7:
                         return "error2"
                     if stripped_line[0] not in ['+','-']:
                         return "error2"
                     if not stripped_line[1:].isdigit():
                         return "error2"
-                    self.ml.loaddata(line_index,
+                    if len(stripped_line) == 5:
+                        self.ml.loaddata(line_index,
                                      ''.join((stripped_line[0]+"0"+
                                               stripped_line[1:3]+"0"+stripped_line[3:])))
+                    if len(stripped_line) == 7:
+                        self.ml.loaddata(line_index, stripped_line)
                 self.exec.cleardata(None, 1, 1)
         else:
             return "error1"
