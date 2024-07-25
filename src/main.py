@@ -243,7 +243,7 @@ class FileManager:
     def load_file(self, default_filename: str = ""):
         '''load file contents to memory'''
         filename = ""
-        
+
         if default_filename != "":
             filename = default_filename
         else:
@@ -323,7 +323,8 @@ class MemoryDisplay:
                                              troughcolor=theme["scroll_bar_background"],
                                              activebackground=theme["active_foreground"])
         self.exec = BasicMLExec(self.ml, self.poiaccu)
-        self.file_buttons_frame = tk.Frame(self.memory_frame, background=theme["background"], height=5)
+        self.file_buttons_frame = tk.Frame(self.memory_frame, background=theme["background"],
+                                           height=5)
         self.load_button = tk.Button(self.file_buttons_frame, fg=theme["text"], text="Load File",
                                      command=self.load_file, background=theme["foreground"],
                                      activebackground=theme["active_foreground"])
@@ -339,19 +340,21 @@ class MemoryDisplay:
                                     text="Save Memory", background=theme["foreground"],
                                     activebackground=theme["active_foreground"],
                                     command=self.save, fg=theme["text"])
-        
+
 
         self.available_files = ["Option 1", "Option 2", "Option 3", "Option 4"]
 
-        self.test_dropdown = tk.Listbox(self.tab_frame, height=3, selectmode=tk.SINGLE, exportselection=False)
-        self.test_dropdown.bind('<<ListboxSelect>>', self.on_tab_select)
-        self.tab_scrollbar = tk.Scrollbar(self.tab_frame, command=self.test_dropdown.yview, background=theme["scroll_bar"],
+        self.tab_list = tk.Listbox(self.tab_frame, height=3, selectmode=tk.SINGLE,
+                                        exportselection=False)
+        self.tab_list.bind('<<ListboxSelect>>', self.on_tab_select)
+        self.tab_scrollbar = tk.Scrollbar(self.tab_frame, command=self.tab_list.yview,
+                                          background=theme["scroll_bar"],
                                              troughcolor=theme["scroll_bar_background"],
                                              activebackground=theme["active_foreground"])
         # provides the context for saving the tab when a tab change is detected
 
 
-                
+
 
 
     def launch(self):
@@ -362,7 +365,7 @@ class MemoryDisplay:
                                padx=5)
         self.memory_label.pack(side=tk.TOP,
                                pady=5)
-        
+
         # File buttons
         self.file_buttons_frame.pack(side=tk.BOTTOM,
                                padx=5, pady=5,)
@@ -373,16 +376,15 @@ class MemoryDisplay:
         self.save_button.pack(side=tk.LEFT,
                                pady=5, padx=5)
 
-        # TODO REMOVE
         self.tab_frame.pack(side=tk.TOP,
                                fill=tk.BOTH,
                                pady=5)
-        self.test_dropdown.pack(side=tk.LEFT,
+        self.tab_list.pack(side=tk.LEFT,
                                 fill=tk.X,
                                 expand=True,
                                )
         self.tab_scrollbar.pack(side=tk.RIGHT, fill=tk.BOTH)
-        self.test_dropdown.config(yscrollcommand=self.tab_scrollbar.set)
+        self.tab_list.config(yscrollcommand=self.tab_scrollbar.set)
 
 
         self.save_memory_button.pack(side=tk.BOTTOM,
@@ -406,27 +408,29 @@ class MemoryDisplay:
         self.sync_scroll()
 
     def close_file(self):
-        selected_index = self.test_dropdown.curselection()
-        length = len(self.test_dropdown.get(0, tk.END))
+        '''removes a file from the tab dictionary'''
+        selected_index = self.tab_list.curselection()
+        length = len(self.tab_list.get(0, tk.END))
         if selected_index:
-            selected_tab = self.test_dropdown.get(selected_index)
-            self.test_dropdown.delete(selected_index)
+            selected_tab = self.tab_list.get(selected_index)
+            self.tab_list.delete(selected_index)
             del self.mainwindow.tabs[selected_tab]
             if selected_index[0] > 0:
-                previous_tab = self.test_dropdown.get(selected_index[0]-1)
-                self.test_dropdown.selection_set(selected_index[0]-1)
+                previous_tab = self.tab_list.get(selected_index[0]-1)
+                self.tab_list.selection_set(selected_index[0]-1)
                 self.mainwindow.change_tab(previous_tab)
             elif length > 1:
-                next_tab = self.test_dropdown.get(1)
-                self.test_dropdown.selection_set(0)
+                next_tab = self.tab_list.get(1)
+                self.tab_list.selection_set(0)
                 self.mainwindow.change_tab(next_tab)
             else:
                 self.ml.memory = ["+000000"]*250
                 self.load()
 
     def on_tab_select(self, event):
+        '''selects new tab'''
         w = event.widget
-        if w.curselection():      
+        if w.curselection():
             index = int(w.curselection()[0])
             value = w.get(index)
             if value != self.mainwindow.selected_tab:
@@ -449,10 +453,10 @@ class MemoryDisplay:
             return
 
         # selecting the right tab after insertion
-        self.test_dropdown.insert(tk.END, info)
-        self.test_dropdown.selection_clear(0,tk.END)
-        self.test_dropdown.selection_set(tk.END)
-        self.test_dropdown.event_generate("<<ListboxSelect>>")
+        self.tab_list.insert(tk.END, info)
+        self.tab_list.selection_clear(0,tk.END)
+        self.tab_list.selection_set(tk.END)
+        self.tab_list.event_generate("<<ListboxSelect>>")
         # changing tab data to the newly loaded file
         self.mainwindow.add_tab(info)
         return
@@ -502,7 +506,7 @@ class MemoryDisplay:
         for i in range(len(lines), 250):
             self.ml.memory[i] = "+000000"
         self.mainwindow.update_display()
-        
+
         if not quiet:
             self.ml.print("Memory saved successfully.")
 
