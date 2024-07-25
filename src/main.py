@@ -230,28 +230,38 @@ class BasicMLExec:
 
 class FileManager:
     '''manages loading and saving files'''
-    def __init__(self, ml, execu):
+    def __init__(self, ml, execu, mainwindow):
+        self.mainwindow = mainwindow
         self.ml = ml
         self.exec = execu
+        self.opcodes = [
+            "10","11","20","21",
+            "30","31","32","33",
+            "40","41","42","43"
+        ]
 
-    def load_file(self):
+    def load_file(self, default_filename: str = ""):
         '''load file contents to memory'''
-        filename = filedialog.askopenfilename()
+        filename = ""
+
+        if default_filename != "":
+            filename = default_filename
+        else:
+            filename = filedialog.askopenfilename()
+
         if filename == '':
             return
+        self.mainwindow.save_tab(self.mainwindow.selected_tab)
         self.exec.cleardata(1, 1, 1)
         if filename:
             with open(filename,'r', encoding='utf-8') as file:
-                  # Reading lines
+                # Reading lines
                 lines = file.readlines()
                 first_line_length = len(lines[0].strip())
-                
                 for i in range(1, len(lines)):
                     current_line_length = len(lines[i].strip())
                     if current_line_length != first_line_length:
                         return "error3"
-        
- 
                 # Adding lines to memory
                 for line_index, line in enumerate(lines):
                     stripped_line = line.rstrip('\n')
@@ -261,14 +271,19 @@ class FileManager:
                         return "error2"
                     if not stripped_line[1:].isdigit():
                         return "error2"
-                    
+
                     if len(stripped_line) == 5:
-                        self.ml.loaddata(line_index,
-                                     ''.join((stripped_line[0]+"0"+
-                                              stripped_line[1:3]+"0"+stripped_line[3:])))
+                        if stripped_line[1:3] in self.opcodes:
+                            self.ml.loaddata(line_index,
+                                        ''.join((stripped_line[0]+"0"+
+                                                stripped_line[1:3]+"0"+stripped_line[3:])))
+                        else:
+                            self.ml.loaddata(line_index,
+                                        ''.join((stripped_line[0]+"00"+stripped_line[1:])))
                     if len(stripped_line) == 7:
                         self.ml.loaddata(line_index, stripped_line)
                 self.exec.cleardata(None, 1, 1)
+                return filename
         else:
             return "error1"
 
@@ -291,14 +306,12 @@ class MemoryDisplay:
         self.mainwindow = mainwindow
         self.root = self.mainwindow.root
         self.ml = self.mainwindow.ml
-
+        self.poiaccu = self.mainwindow.poiaccu
         self.memory_frame = tk.Frame(self.root, background=theme["background"])
+        self.tab_frame = tk.Frame(self.memory_frame, background=theme["background"])
         self.memory_label = tk.Label(self.memory_frame, background=theme["background"],
                                      text="Program Memory", fg=theme["text"])
-        self.save_memory_button = tk.Button(self.memory_frame,
-                                            text="Save Memory", background=theme["foreground"],
-                                            activebackground=theme["active_foreground"],
-                                            command=self.save, fg=theme["text"])
+
         self.line_numbers = tk.Text(self.memory_frame,
                                     width=5,
                                     state="disabled", background=theme["text_background"])
@@ -309,6 +322,40 @@ class MemoryDisplay:
                                              background=theme["scroll_bar"],
                                              troughcolor=theme["scroll_bar_background"],
                                              activebackground=theme["active_foreground"])
+        self.exec = BasicMLExec(self.ml, self.poiaccu)
+        self.file_buttons_frame = tk.Frame(self.memory_frame, background=theme["background"],
+                                           height=5)
+        self.load_button = tk.Button(self.file_buttons_frame, fg=theme["text"], text="Load File",
+                                     command=self.load_file, background=theme["foreground"],
+                                     activebackground=theme["active_foreground"])
+        self.close_button = tk.Button(self.file_buttons_frame, fg=theme["text"], text="Close File",
+                                     command=self.close_file, background=theme["foreground"],
+                                     activebackground=theme["active_foreground"])
+        self.save_button = tk.Button(self.file_buttons_frame, fg=theme["text"], text="Save File",
+                                     command=self.save_file, background=theme["foreground"],
+                                     activebackground=theme["active_foreground"])
+        self.fileman = FileManager(self.ml, self.exec,  mainwindow)
+
+        self.save_memory_button = tk.Button(self.file_buttons_frame,
+                                    text="Save Memory", background=theme["foreground"],
+                                    activebackground=theme["active_foreground"],
+                                    command=self.save, fg=theme["text"])
+
+
+        self.available_files = ["Option 1", "Option 2", "Option 3", "Option 4"]
+
+        self.tab_list = tk.Listbox(self.tab_frame, height=3, selectmode=tk.SINGLE,
+                                        exportselection=False)
+        self.tab_list.bind('<<ListboxSelect>>', self.on_tab_select)
+        self.tab_scrollbar = tk.Scrollbar(self.tab_frame, command=self.tab_list.yview,
+                                          background=theme["scroll_bar"],
+                                             troughcolor=theme["scroll_bar_background"],
+                                             activebackground=theme["active_foreground"])
+        # provides the context for saving the tab when a tab change is detected
+
+
+
+
 
     def launch(self):
         '''Finishes initializing memory frame'''
@@ -318,6 +365,28 @@ class MemoryDisplay:
                                padx=5)
         self.memory_label.pack(side=tk.TOP,
                                pady=5)
+
+        # File buttons
+        self.file_buttons_frame.pack(side=tk.BOTTOM,
+                               padx=5, pady=5,)
+        self.load_button.pack(side=tk.RIGHT,
+                               pady=5, padx=5)
+        self.close_button.pack(side=tk.LEFT,
+                               pady=5)
+        self.save_button.pack(side=tk.LEFT,
+                               pady=5, padx=5)
+
+        self.tab_frame.pack(side=tk.TOP,
+                               fill=tk.BOTH,
+                               pady=5)
+        self.tab_list.pack(side=tk.LEFT,
+                                fill=tk.X,
+                                expand=True,
+                               )
+        self.tab_scrollbar.pack(side=tk.RIGHT, fill=tk.BOTH)
+        self.tab_list.config(yscrollcommand=self.tab_scrollbar.set)
+
+
         self.save_memory_button.pack(side=tk.BOTTOM,
                                      pady=5)
         self.line_numbers.pack(side=tk.LEFT,
@@ -338,6 +407,66 @@ class MemoryDisplay:
         self.load()
         self.sync_scroll()
 
+    def close_file(self):
+        '''removes a file from the tab dictionary'''
+        selected_index = self.tab_list.curselection()
+        length = len(self.tab_list.get(0, tk.END))
+        if selected_index:
+            selected_tab = self.tab_list.get(selected_index)
+            self.tab_list.delete(selected_index)
+            del self.mainwindow.tabs[selected_tab]
+            if selected_index[0] > 0:
+                previous_tab = self.tab_list.get(selected_index[0]-1)
+                self.tab_list.selection_set(selected_index[0]-1)
+                self.mainwindow.change_tab(previous_tab)
+            elif length > 1:
+                next_tab = self.tab_list.get(1)
+                self.tab_list.selection_set(0)
+                self.mainwindow.change_tab(next_tab)
+            else:
+                self.ml.memory = ["+000000"]*250
+                self.load()
+
+    def on_tab_select(self, event):
+        '''selects new tab'''
+        w = event.widget
+        if w.curselection():
+            index = int(w.curselection()[0])
+            value = w.get(index)
+            if value != self.mainwindow.selected_tab:
+                self.mainwindow.change_tab(value)
+
+
+    def load_file(self):
+        '''method for loading file from button click'''
+        backup_memory = self.ml.memory
+        info = self.fileman.load_file()
+        if info == "error1":
+            self.mainwindow.outin.gui_output("File does not exist.")
+            self.ml.memory = backup_memory
+            self.load()
+            return
+        if info == "error2" or info == "error3":
+            self.mainwindow.outin.gui_output("File contents are not in correct format")
+            self.ml.memory = backup_memory
+            self.load()
+            return
+
+        # selecting the right tab after insertion
+        self.tab_list.insert(tk.END, info)
+        self.tab_list.selection_clear(0,tk.END)
+        self.tab_list.selection_set(tk.END)
+        self.tab_list.event_generate("<<ListboxSelect>>")
+        # changing tab data to the newly loaded file
+        self.mainwindow.add_tab(info)
+        return
+
+    def save_file(self):
+        '''saves a file from memory location'''
+        self.fileman.save_file()
+
+
+
     def load(self):
         '''Loads memory into memory frame'''
         self.memory_text.delete("1.0", tk.END)
@@ -350,7 +479,7 @@ class MemoryDisplay:
 
         self.update_line_numbers()
 
-    def save(self):
+    def save(self, quiet: bool = False):
         '''Saves memory from memory frame'''
         content = self.memory_text.get("1.0", "end-1c")
         lines = content.splitlines()
@@ -378,7 +507,8 @@ class MemoryDisplay:
             self.ml.memory[i] = "+000000"
         self.mainwindow.update_display()
 
-        self.ml.print("Memory saved successfully.")
+        if not quiet:
+            self.ml.print("Memory saved successfully.")
 
     def scroll_position(self):
         '''Gets scroll position'''
@@ -508,15 +638,6 @@ class Controls:
         self.poiaccu = self.mainwindow.poiaccu
         self.outin = self.mainwindow.outin
         self.exec = BasicMLExec(self.ml, self.poiaccu)
-        self.fileman = FileManager(self.ml, self.exec)
-        self.buttons1_frame = tk.Frame(self.root, background=theme["background"])
-
-        self.load_button = tk.Button(self.buttons1_frame, fg=theme["text"], text="Load File",
-                                     command=self.load_file, background=theme["foreground"],
-                                     activebackground=theme["active_foreground"])
-        self.save_button = tk.Button(self.buttons1_frame, fg=theme["text"], text="Save File",
-                                     command=self.save_file, background=theme["foreground"],
-                                     activebackground=theme["active_foreground"])
 
         self.buttons2_frame = tk.Frame(self.root, background=theme["background"])
 
@@ -533,10 +654,6 @@ class Controls:
 
     def launch(self):
         '''initializes button frame'''
-        self.buttons1_frame.pack(side = tk.TOP, fill=tk.X)
-
-        self.load_button.pack(side=tk.LEFT, padx=5, pady=5)
-        self.save_button.pack(side=tk.LEFT, padx=5, pady=5)
 
         self.buttons2_frame.pack(side = tk.TOP, fill=tk.X,)
 
@@ -544,23 +661,6 @@ class Controls:
         self.continue_button.pack(side=tk.LEFT, padx=5, pady=5)
         self.step_button.pack(side=tk.LEFT, padx=5, pady=5)
 
-    def load_file(self):
-        '''method for loading file from button click'''
-        info = self.fileman.load_file()
-        if info == "error1":
-            self.outin.gui_output("File does not exist.")
-            return
-        if info == "error2":
-            self.outin.gui_output("File contents are not in correct format")
-            return
-        if info == "error3":
-            self.outin.gui_output("Error files content need to be all 6 or all 4 digit")
-            return
-        return
-
-    def save_file(self):
-        '''saves a file from memory location'''
-        self.fileman.save_file()
 
     def run_fromstart(self):
         '''runs program from start'''
@@ -632,7 +732,7 @@ class ConsoleInputDisplay:
         '''input entry logic'''
         self.gui_output(prompt)
         self.input_entry.config(state=tk.NORMAL, background=theme["text_background"],
-                                foreground=theme["text_background"])
+                            )
 
         self.input_entry_var.set("")
         self.input_entry.focus_set()
@@ -677,13 +777,15 @@ class BasicMLGUI:
     def __init__(self):
         self.root = tk.Tk()
         self.ml = BasicML()
-        self.memory = MemoryDisplay(self)
         self.poiaccu = PointAccumDisplay(self)
         self.outin = ConsoleInputDisplay(self)
+        self.memory = MemoryDisplay(self)
         self.controls = Controls(self)
         self.ml.print = self.outin.gui_output
         self.ml.input = self.outin.gui_input
         self.ml.set_update_callback(self.update_display)
+        self.tabs = {}
+        self.selected_tab = ""
 
     def update_display(self):
         '''updates the display whenever there's a change in BasicML'''
@@ -692,6 +794,29 @@ class BasicMLGUI:
         self.poiaccu.pointer_entry.insert(0, f"{self.ml.pointer:03}")
         self.poiaccu.accumulator_entry.delete(0, tk.END)
         self.poiaccu.accumulator_entry.insert(0, f"{self.ml.accumulator}")
+
+    def add_tab(self, file_name: str):
+        '''adds a tab to the tabs dictionary'''
+        # saving tab before switching
+        self.tabs[file_name] = self.ml.memory
+
+    def save_tab(self, file_name: str):
+        '''saves the content of the provided tab'''
+        self.memory.save(quiet=True)
+        self.tabs[file_name] = self.ml.memory
+
+    def change_tab(self, file_name: str):
+        '''changes the memory instance'''
+        # saving tab before switching
+        if self.selected_tab != "":
+            self.memory.save()
+        if file_name not in self.tabs:
+            self.add_tab(file_name)
+        # updating memory
+        self.ml.memory = self.tabs[file_name]
+        self.memory.load()
+        # updating the selected tab
+        self.selected_tab = file_name
 
     def start(self):
         '''sets up GUI window and runs mainloop'''
